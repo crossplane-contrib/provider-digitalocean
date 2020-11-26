@@ -1,5 +1,5 @@
 run:
-  deadline: 2m
+  timeout: 10m
 
   skip-files:
   - "zz_generated\\..+\\.go$"
@@ -38,7 +38,7 @@ linters-settings:
   goimports:
     # put imports beginning with prefix after 3rd-party packages;
     # it's a comma-separated list of prefixes
-    local-prefixes: github.com/crossplane/provider-gcp
+    local-prefixes: github.com/khos2ow/provider-digitalocean
 
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
@@ -136,7 +136,7 @@ issues:
         - gosec
         - scopelint
         - unparam
-    
+
     # Ease some gocritic warnings on test files.
     - path: _test\.go
       text: "(unnamedResult|exitAfterDefer)"

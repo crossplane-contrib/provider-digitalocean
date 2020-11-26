@@ -1,0 +1,12 @@
+apiVersion: meta.pkg.crossplane.io/v1alpha1
+kind: Provider
+metadata:
+  name: provider-digitalocean
+  annotations:
+    source: github.com/khos2ow/provider-digitalocean
+    license: Apache-2.0
+    descriptionShort: |
+      The DigitalOcean Crossplane provider enables infrastructure management for DigitalOcean.
+spec:
+  controller:
+    image: khos2ow/provider-digitalocean-controller:VERSION

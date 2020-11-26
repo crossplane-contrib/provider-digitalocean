@@ -26,20 +26,21 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
-	"github.com/crossplane/provider-template/apis"
-	"github.com/crossplane/provider-template/pkg/controller"
+	"github.com/khos2ow/provider-digitalocean/apis"
+	"github.com/khos2ow/provider-digitalocean/pkg/controller"
 )
 
 func main() {
 	var (
-		app        = kingpin.New(filepath.Base(os.Args[0]), "Template support for Crossplane.").DefaultEnvars()
-		debug      = app.Flag("debug", "Run with debug logging.").Short('d').Bool()
-		syncPeriod = app.Flag("sync", "Controller manager sync period such as 300ms, 1.5h, or 2h45m").Short('s').Default("1h").Duration()
+		app            = kingpin.New(filepath.Base(os.Args[0]), "DigitalOcean support for Crossplane.").DefaultEnvars()
+		debug          = app.Flag("debug", "Run with debug logging.").Short('d').Bool()
+		syncPeriod     = app.Flag("sync", "Controller manager sync period duration such as 300ms, 1.5h or 2h45m").Short('s').Default("1h").Duration()
+		leaderElection = app.Flag("leader-election", "Use leader election for the conroller manager.").Short('l').Default("false").OverrideDefaultFromEnvar("LEADER_ELECTION").Bool()
 	)
 	kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	zl := zap.New(zap.UseDevMode(*debug))
-	log := logging.NewLogrLogger(zl.WithName("provider-template"))
+	log := logging.NewLogrLogger(zl.WithName("provider-digitalocean"))
 	if *debug {
 		// The controller-runtime runs with a no-op logger by default. It is
 		// *very* verbose even at info level, so we only provide it a real
@@ -52,10 +53,14 @@ func main() {
 	cfg, err := ctrl.GetConfig()
 	kingpin.FatalIfError(err, "Cannot get API server rest config")
 
-	mgr, err := ctrl.NewManager(cfg, ctrl.Options{SyncPeriod: syncPeriod})
+	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
+		LeaderElection:   *leaderElection,
+		LeaderElectionID: "crossplane-leader-election-provider-digitalocean",
+		SyncPeriod:       syncPeriod,
+	})
 	kingpin.FatalIfError(err, "Cannot create controller manager")
 
-	kingpin.FatalIfError(apis.AddToScheme(mgr.GetScheme()), "Cannot add Template APIs to scheme")
-	kingpin.FatalIfError(controller.Setup(mgr, log), "Cannot setup Template controllers")
+	kingpin.FatalIfError(apis.AddToScheme(mgr.GetScheme()), "Cannot add DigitalOcean APIs to scheme")
+	kingpin.FatalIfError(controller.Setup(mgr, log), "Cannot setup DigitalOcean controllers")
 	kingpin.FatalIfError(mgr.Start(ctrl.SetupSignalHandler()), "Cannot start controller manager")
 }
