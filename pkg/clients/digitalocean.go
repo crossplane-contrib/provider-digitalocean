@@ -60,3 +60,55 @@ func GetAuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (tok
 	}
 	return string(s.Data[ref.Key]), nil
 }
+
+// LateInitialize functions initialize s(first argument), presumed to be an
+// optional field of a Kubernetes API object's spec per Kubernetes
+// "late initialization" semantics. s is returned unchanged if it is non-nil
+// or from(second argument) is the empty string, otherwise a pointer to from
+// is returned.
+// https://github.com/kubernetes/community/blob/db7f270f/contributors/devel/sig-architecture/api-conventions.md#optional-vs-required
+// https://github.com/kubernetes/community/blob/db7f270f/contributors/devel/sig-architecture/api-conventions.md#late-initialization
+// TODO(muvaf): These functions will probably be needed by other providers.
+// Consider moving them to crossplane-runtime.
+
+// LateInitializeString implements late initialization for string type.
+func LateInitializeString(s *string, from string) *string {
+	if s != nil || from == "" {
+		return s
+	}
+	return &from
+}
+
+// LateInitializeInt64 implements late initialization for int64 type.
+func LateInitializeInt64(i *int64, from int64) *int64 {
+	if i != nil || from == 0 {
+		return i
+	}
+	return &from
+}
+
+// LateInitializeBool implements late initialization for bool type.
+func LateInitializeBool(b *bool, from bool) *bool {
+	if b != nil || !from {
+		return b
+	}
+	return &from
+}
+
+// LateInitializeStringSlice implements late initialization for
+// string slice type.
+func LateInitializeStringSlice(s []string, from []string) []string {
+	if len(s) != 0 || len(from) == 0 {
+		return s
+	}
+	return from
+}
+
+// LateInitializeStringMap implements late initialization for
+// string map type.
+func LateInitializeStringMap(s map[string]string, from map[string]string) map[string]string {
+	if len(s) != 0 || len(from) == 0 {
+		return s
+	}
+	return from
+}
