@@ -74,7 +74,7 @@ spec:
                   ssh_keys:
                     description: 'SSHKeys: An array containing the IDs or fingerprints of the SSH keys that you wish to embed in the Droplet''s root account upon creation.'
                     items:
-                      type: integer
+                      type: string
                     type: array
                   tags:
                     description: 'Tags: A flat array of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.'

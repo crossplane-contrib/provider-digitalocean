@@ -61,6 +61,24 @@ func GetAuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (tok
 	return string(s.Data[ref.Key]), nil
 }
 
+// StringValue converts the supplied string pointer to a string, returning the
+// empty string if the pointer is nil.
+func StringValue(v *string) string {
+	if v == nil {
+		return ""
+	}
+	return *v
+}
+
+// BoolValue converts the supplied bool pointer to an bool, returning false if
+// the pointer is nil.
+func BoolValue(v *bool) bool {
+	if v == nil {
+		return false
+	}
+	return *v
+}
+
 // LateInitialize functions initialize s(first argument), presumed to be an
 // optional field of a Kubernetes API object's spec per Kubernetes
 // "late initialization" semantics. s is returned unchanged if it is non-nil

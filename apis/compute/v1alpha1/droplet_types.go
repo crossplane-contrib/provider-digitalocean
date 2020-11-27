@@ -54,7 +54,7 @@ type DropletParameters struct {
 	// that you wish to embed in the Droplet's root account upon creation.
 	// +optional
 	// +immutable
-	SSHKeys []int `json:"ssh_keys"`
+	SSHKeys []string `json:"ssh_keys"`
 
 	// Backups: A boolean indicating whether automated backups should be enabled
 	// for the Droplet. Automated backups can only be enabled when the Droplet is
