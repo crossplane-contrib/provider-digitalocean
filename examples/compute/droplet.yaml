@@ -1,0 +1,11 @@
+apiVersion: compute.do.crossplane.io/v1alpha1
+kind: Droplet
+metadata:
+  name: example
+spec:
+  forProvider:
+    region: sfo1
+    size: s-1vcpu-1gb
+    image: ubuntu-20-04-x64
+  providerConfigRef:
+    name: example
