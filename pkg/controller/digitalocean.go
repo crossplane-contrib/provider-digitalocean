@@ -21,6 +21,7 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
+	"github.com/khos2ow/provider-digitalocean/pkg/controller/compute"
 	"github.com/khos2ow/provider-digitalocean/pkg/controller/config"
 )
 
@@ -29,6 +30,7 @@ import (
 func Setup(mgr ctrl.Manager, l logging.Logger) error {
 	for _, setup := range []func(ctrl.Manager, logging.Logger) error{
 		config.Setup,
+		compute.SetupDroplet,
 	} {
 		if err := setup(mgr, l); err != nil {
 			return err
