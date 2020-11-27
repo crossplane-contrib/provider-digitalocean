@@ -103,7 +103,7 @@ func (in *DropletParameters) DeepCopyInto(out *DropletParameters) {
 	*out = *in
 	if in.SSHKeys != nil {
 		in, out := &in.SSHKeys, &out.SSHKeys
-		*out = make([]int, len(*in))
+		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
 	if in.Backups != nil {

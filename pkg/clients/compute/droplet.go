@@ -26,66 +26,52 @@ import (
 )
 
 // GenerateDroplet generates *godo.DropletCreateRequest instance from DropletParameters.
-// nolint:gocyclo
 func GenerateDroplet(name string, in v1alpha1.DropletParameters, create *godo.DropletCreateRequest) {
 	create.Name = name
 	create.Region = in.Region
 	create.Size = in.Size
+	create.Image = generateImage(in.Image)
+	create.SSHKeys = generateSSHKeys(in.SSHKeys)
+	create.Backups = do.BoolValue(in.Backups)
+	create.IPv6 = do.BoolValue(in.IPv6)
+	create.PrivateNetworking = do.BoolValue(in.PrivateNetworking)
+	create.Monitoring = do.BoolValue(in.Monitoring)
+	create.Volumes = generateVolumes(in.Volumes)
+	create.Tags = in.Tags
+	create.VPCUUID = do.StringValue(in.VPCUUID)
+}
 
-	create.Image = godo.DropletCreateImage{}
-
-	if imageID, err := strconv.Atoi(in.Image); err == nil {
-		create.Image.ID = imageID
+func generateImage(param string) godo.DropletCreateImage {
+	image := godo.DropletCreateImage{}
+	if imageID, err := strconv.Atoi(param); err == nil {
+		image.ID = imageID
 	} else {
-		create.Image.Slug = in.Image
+		image.Slug = param
 	}
+	return image
+}
 
-	if len(in.SSHKeys) > 0 {
-		keys := make([]godo.DropletCreateSSHKey, len(in.Volumes))
-		for _, k := range in.Volumes {
-			if id, err := strconv.Atoi(k); err == nil {
-				keys = append(keys, godo.DropletCreateSSHKey{ID: id})
-			} else {
-				keys = append(keys, godo.DropletCreateSSHKey{Fingerprint: k})
-			}
+func generateSSHKeys(param []string) []godo.DropletCreateSSHKey {
+	keys := make([]godo.DropletCreateSSHKey, len(param))
+	for _, k := range param {
+		if id, err := strconv.Atoi(k); err == nil {
+			keys = append(keys, godo.DropletCreateSSHKey{ID: id})
+		} else {
+			keys = append(keys, godo.DropletCreateSSHKey{Fingerprint: k})
 		}
-		create.SSHKeys = keys
 	}
+	return keys
+}
 
-	if in.Backups != nil {
-		create.Backups = *in.Backups
-	}
-
-	if in.IPv6 != nil {
-		create.IPv6 = *in.IPv6
-	}
-
-	if in.PrivateNetworking != nil {
-		create.PrivateNetworking = *in.PrivateNetworking
-	}
-
-	if in.Monitoring != nil {
-		create.Monitoring = *in.Monitoring
-	}
-
-	if len(in.Volumes) > 0 {
-		volumes := make([]godo.DropletCreateVolume, len(in.Volumes))
-		for _, v := range in.Volumes {
-			if v == "" {
-				continue
-			}
-			volumes = append(volumes, godo.DropletCreateVolume{ID: v})
+func generateVolumes(param []string) []godo.DropletCreateVolume {
+	volumes := make([]godo.DropletCreateVolume, len(param))
+	for _, v := range param {
+		if v == "" {
+			continue
 		}
-		create.Volumes = volumes
+		volumes = append(volumes, godo.DropletCreateVolume{ID: v})
 	}
-
-	if len(in.Tags) > 0 {
-		create.Tags = in.Tags
-	}
-
-	if in.VPCUUID != nil {
-		create.VPCUUID = *in.VPCUUID
-	}
+	return volumes
 }
 
 // LateInitializeSpec updates any unset (i.e. nil) optional fields of the
