@@ -18,6 +18,7 @@ package compute
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/digitalocean/godo"
 	"github.com/google/go-cmp/cmp"
@@ -60,6 +61,7 @@ func SetupDroplet(mgr ctrl.Manager, l logging.Logger) error {
 			managed.WithExternalConnecter(&dropletConnector{kube: mgr.GetClient()}),
 			managed.WithReferenceResolver(managed.NewAPISimpleReferenceResolver(mgr.GetClient())),
 			managed.WithConnectionPublishers(),
+			managed.WithInitializers(managed.NewDefaultProviderConfig(mgr.GetClient())),
 			managed.WithLogger(l.WithValues("controller", name)),
 			managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name)))))
 }
@@ -87,9 +89,24 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 	if !ok {
 		return managed.ExternalObservation{}, errors.New(errNotDroplet)
 	}
-	observed, _, err := c.Droplets.Get(ctx, cr.Status.AtProvider.ID)
+
+	if meta.GetExternalName(cr) == "" {
+		return managed.ExternalObservation{
+			ResourceExists: false,
+		}, nil
+	}
+
+	externalID, err := strconv.Atoi(meta.GetExternalName(cr))
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(err, errGetDroplet)
+		// on the first try the value of 'crossplane.io/external-name' annotaion
+		// is name of the 'Droplet' resource (i.e. type string,) which will get
+		// updated to id (i.e. type int) of managed resource when it gets created.
+		externalID = 0
+	}
+
+	observed, response, err := c.Droplets.Get(ctx, externalID)
+	if err != nil {
+		return managed.ExternalObservation{}, errors.Wrap(docompute.IgnoreNotFound(err, response), errGetDroplet)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
@@ -132,12 +149,13 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 	docompute.GenerateDroplet(meta.GetExternalName(cr), cr.Spec.ForProvider, create)
 
 	droplet, _, err := c.Droplets.Create(ctx, create)
-	if err != nil {
-		cr.Status.AtProvider.ID = droplet.ID
-		cr.Status.AtProvider.CreationTimestamp = droplet.Created
-		cr.Status.AtProvider.Status = droplet.Status
+	if err != nil || droplet == nil {
+		return managed.ExternalCreation{}, errors.Wrap(err, errDropletCreateFailed)
 	}
-	return managed.ExternalCreation{}, errors.Wrap(err, errDropletCreateFailed)
+
+	meta.SetExternalName(cr, strconv.Itoa(droplet.ID))
+
+	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
 }
 
 func (c *dropletExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
@@ -152,6 +170,7 @@ func (c *dropletExternal) Delete(ctx context.Context, mg resource.Managed) error
 	}
 
 	cr.Status.SetConditions(xpv1.Deleting())
-	_, err := c.Droplets.Delete(ctx, cr.Status.AtProvider.ID)
-	return errors.Wrap(err, errDropletDeleteFailed)
+
+	response, err := c.Droplets.Delete(ctx, cr.Status.AtProvider.ID)
+	return errors.Wrap(docompute.IgnoreNotFound(err, response), errDropletDeleteFailed)
 }
