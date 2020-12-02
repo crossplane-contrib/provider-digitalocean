@@ -25,7 +25,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	runtimev1alpha1 "github.com/crossplane/crossplane-runtime/apis/core/v1alpha1"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
@@ -108,9 +108,9 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 
 	switch cr.Status.AtProvider.Status {
 	case v1alpha1.StatusNew:
-		cr.SetConditions(runtimev1alpha1.Creating())
+		cr.SetConditions(xpv1.Creating())
 	case v1alpha1.StatusActive:
-		cr.SetConditions(runtimev1alpha1.Available())
+		cr.SetConditions(xpv1.Available())
 	}
 
 	// Droplets are always "up to date" because they can't be updated. ¯\_(ツ)_/¯
@@ -126,7 +126,7 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 		return managed.ExternalCreation{}, errors.New(errNotDroplet)
 	}
 
-	cr.Status.SetConditions(runtimev1alpha1.Creating())
+	cr.Status.SetConditions(xpv1.Creating())
 
 	create := &godo.DropletCreateRequest{}
 	docompute.GenerateDroplet(meta.GetExternalName(cr), cr.Spec.ForProvider, create)
@@ -151,7 +151,7 @@ func (c *dropletExternal) Delete(ctx context.Context, mg resource.Managed) error
 		return errors.New(errNotDroplet)
 	}
 
-	cr.Status.SetConditions(runtimev1alpha1.Deleting())
+	cr.Status.SetConditions(xpv1.Deleting())
 	_, err := c.Droplets.Delete(ctx, cr.Status.AtProvider.ID)
 	return errors.Wrap(err, errDropletDeleteFailed)
 }

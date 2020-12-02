@@ -3,7 +3,7 @@ module github.com/khos2ow/provider-digitalocean
 go 1.13
 
 require (
-	github.com/crossplane/crossplane-runtime v0.11.0
+	github.com/crossplane/crossplane-runtime v0.11.1-0.20201120062856-57ef784bfe43
 	github.com/crossplane/crossplane-tools v0.0.0-20201007233256-88b291e145bb
 	github.com/digitalocean/godo v1.54.0
 	github.com/google/go-cmp v0.5.0

@@ -19,7 +19,7 @@ package v1alpha1
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/crossplane/crossplane-runtime/apis/core/v1alpha1"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 )
 
 // Known Droplet statuses.
@@ -122,14 +122,14 @@ type DropletObservation struct {
 
 // A DropletSpec defines the desired state of a Droplet.
 type DropletSpec struct {
-	v1alpha1.ResourceSpec `json:",inline"`
-	ForProvider           DropletParameters `json:"forProvider"`
+	xpv1.ResourceSpec `json:",inline"`
+	ForProvider       DropletParameters `json:"forProvider"`
 }
 
 // A DropletStatus represents the observed state of a Droplet.
 type DropletStatus struct {
-	v1alpha1.ResourceStatus `json:",inline"`
-	AtProvider              DropletObservation `json:"atProvider,omitempty"`
+	xpv1.ResourceStatus `json:",inline"`
+	AtProvider          DropletObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
