@@ -54,32 +54,32 @@ type DropletParameters struct {
 	// that you wish to embed in the Droplet's root account upon creation.
 	// +optional
 	// +immutable
-	SSHKeys []string `json:"ssh_keys"`
+	SSHKeys []string `json:"ssh_keys,omitempty"`
 
 	// Backups: A boolean indicating whether automated backups should be enabled
 	// for the Droplet. Automated backups can only be enabled when the Droplet is
 	// created.
 	// +optional
 	// +immutable
-	Backups *bool `json:"backups"`
+	Backups *bool `json:"backups,omitempty"`
 
 	// IPv6: A boolean indicating whether IPv6 is enabled on the Droplet.
 	// +optional
 	// +immutable
-	IPv6 *bool `json:"ipv6"`
+	IPv6 *bool `json:"ipv6,omitempty"`
 
 	// PrivateNetworking: This parameter has been deprecated. Use 'vpc_uuid'
 	// instead to specify a VPC network for the Droplet. If no `vpc_uuid` is
 	// provided, the Droplet will be placed in the default VPC.
 	// +optional
 	// +immutable
-	PrivateNetworking *bool `json:"private_networking"`
+	PrivateNetworking *bool `json:"private_networking,omitempty"`
 
 	// Monitoring: A boolean indicating whether to install the DigitalOcean
 	// agent for monitoring.
 	// +optional
 	// +immutable
-	Monitoring *bool `json:"monitoring"`
+	Monitoring *bool `json:"monitoring,omitempty"`
 
 	// Volumes: A flat array including the unique string identifier for each block
 	// storage volume to be attached to the Droplet. At the moment a volume can only
@@ -92,7 +92,7 @@ type DropletParameters struct {
 	// is created. Tag names can either be existing or new tags.
 	// +optional
 	// +immutable
-	Tags []string `json:"tags"`
+	Tags []string `json:"tags,omitempty"`
 
 	// VPCUUID: A string specifying the UUID of the VPC to which the Droplet
 	// will be assigned. If excluded, beginning on April 7th, 2020, the Droplet
