@@ -11,3 +11,9 @@ cover.out
 
 # ignore vscode files (debug config etc...)
 /.vscode
+
+# Tilt
+tilt-settings.json
+tild.d/
+tilt_modules/
+cluster/local/provider.Tiltfile
