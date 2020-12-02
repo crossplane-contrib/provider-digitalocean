@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	runtimev1alpha1 "github.com/crossplane/crossplane-runtime/apis/core/v1alpha1"
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
 	"github.com/khos2ow/provider-digitalocean/apis/v1alpha1"
@@ -45,7 +45,7 @@ func GetAuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (tok
 
 	// NOTE(muvaf): When we implement the workload identity, we will only need to
 	// return a different type of option.ClientOption, which is WithTokenSource().
-	if s := pc.Spec.Credentials.Source; s != runtimev1alpha1.CredentialsSourceSecret {
+	if s := pc.Spec.Credentials.Source; s != xpv1.CredentialsSourceSecret {
 		return "", errors.Errorf("unsupported credentials source %q", s)
 	}
 
