@@ -1,0 +1,16 @@
+{
+    "go_main": "./cmd/provider",
+    "cmd_deps": [
+        "go.mod",
+        "go.sum",
+        "apis",
+        "cmd",
+        "pkg"
+    ],
+    "crd_deps": [
+        "apis"
+    ],
+    "crds_folder": "package/crds",
+    "package_name": "khos2ow/provider-digitalocean:master",
+    "image_name": "khos2ow/provider-digitalocean-controller"
+}
