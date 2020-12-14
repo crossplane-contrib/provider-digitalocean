@@ -23,8 +23,19 @@ deploy_provider = symbols['deploy_provider']
 
 ####################################################################################
 # Crossplane Provider
+#
+# Users can use tilt-settings.json to pass additional configuration and
+# parameters for building providers.
+#
+# Example content of tilt-settings.json:
+#
+# {
+#     "args": [],                        // args to pass to pod
+#     "debug": false,                    // enable debug mode
+#     "namespace": "crossplane-system"   // namespace to deploy provider into
+# }
 ####################################################################################
-def build_deploy_providers():
+def build_deploy_provider():
     settings = {
         'args': [],
         'debug': False,
@@ -40,30 +51,25 @@ def build_deploy_providers():
     settings['resource_deps'] = []
     settings['local_image'] = True
 
-    name = 'provider-digitalocean'
-    provider = {
-        'short_name': 'digitalocean',
-        'context': os.getcwd(),
-        'go_main': './cmd/provider',
-        'cmd_deps': [
-            'go.mod',
-            'go.sum',
-            'apis',
-            'cmd',
-            'pkg'
-        ],
-        'crd_deps': [
-            'apis'
-        ],
-        'crds_folder': 'package/crds',
-        'package_name': 'khos2ow/provider-digitalocean:master',
-        'image_name': 'khos2ow/provider-digitalocean-controller'
-    }
+    if os.path.exists('tilt-provider.json') == False:
+        print('Warning: tilt-provider.json is missing!')
+        return
 
-    build_provider(name, provider, settings)
-    deploy_provider(name, provider, settings)
+    provider_name = 'provider-digitalocean'
 
-build_deploy_providers()
+    provider = {}
+    provider.update(read_json(
+        'tilt-provider.json',
+        default = {}
+    ))
+
+    provider['short_name'] = provider_name.replace('provider-', '')
+    provider['context'] = os.getcwd()
+
+    build_provider(provider_name, provider, settings)
+    deploy_provider(provider_name, provider, settings)
+
+build_deploy_provider()
 
 ####################################################################################
 # Custom Tiltfiles
