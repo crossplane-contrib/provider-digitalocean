@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
       - release-*
   pull_request: {}
   workflow_dispatch: {}
@@ -314,4 +314,4 @@ jobs:
           CHANNEL: master
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_USR }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PSW }}
-        
+          
