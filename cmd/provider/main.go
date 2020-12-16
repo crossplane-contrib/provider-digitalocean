@@ -26,8 +26,8 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
-	"github.com/khos2ow/provider-digitalocean/apis"
-	"github.com/khos2ow/provider-digitalocean/pkg/controller"
+	"github.com/crossplane-contrib/provider-digitalocean/apis"
+	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller"
 )
 
 func main() {

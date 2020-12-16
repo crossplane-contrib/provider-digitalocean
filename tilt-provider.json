@@ -11,6 +11,6 @@
         "apis"
     ],
     "crds_folder": "package/crds",
-    "package_name": "khos2ow/provider-digitalocean:master",
-    "image_name": "khos2ow/provider-digitalocean-controller"
+    "package_name": "crossplane/provider-digitalocean:master",
+    "image_name": "crossplane/provider-digitalocean-controller"
 }

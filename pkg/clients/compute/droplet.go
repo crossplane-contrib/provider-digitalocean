@@ -21,8 +21,8 @@ import (
 
 	"github.com/digitalocean/godo"
 
-	"github.com/khos2ow/provider-digitalocean/apis/compute/v1alpha1"
-	do "github.com/khos2ow/provider-digitalocean/pkg/clients"
+	"github.com/crossplane-contrib/provider-digitalocean/apis/compute/v1alpha1"
+	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
 )
 
 // GenerateDroplet generates *godo.DropletCreateRequest instance from DropletParameters.

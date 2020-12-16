@@ -2,7 +2,7 @@
 # Setup Project
 
 PROJECT_NAME := provider-digitalocean
-PROJECT_REPO := github.com/khos2ow/$(PROJECT_NAME)
+PROJECT_REPO := github.com/crossplane-contrib/$(PROJECT_NAME)
 
 PLATFORMS ?= linux_amd64 linux_arm64
 # -include will silently skip missing files, which allows us
@@ -42,7 +42,7 @@ GO111MODULE = on
 # ====================================================================================
 # Setup Images
 
-DOCKER_REGISTRY = khos2ow
+DOCKER_REGISTRY = crossplane
 IMAGES = provider-digitalocean provider-digitalocean-controller
 -include build/makelib/image.mk
 
