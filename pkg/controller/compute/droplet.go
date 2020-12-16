@@ -32,9 +32,9 @@ import (
 	"github.com/crossplane/crossplane-runtime/pkg/reconciler/managed"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
-	"github.com/khos2ow/provider-digitalocean/apis/compute/v1alpha1"
-	do "github.com/khos2ow/provider-digitalocean/pkg/clients"
-	docompute "github.com/khos2ow/provider-digitalocean/pkg/clients/compute"
+	"github.com/crossplane-contrib/provider-digitalocean/apis/compute/v1alpha1"
+	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
+	docompute "github.com/crossplane-contrib/provider-digitalocean/pkg/clients/compute"
 )
 
 const (

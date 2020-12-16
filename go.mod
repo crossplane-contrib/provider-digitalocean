@@ -1,4 +1,4 @@
-module github.com/khos2ow/provider-digitalocean
+module github.com/crossplane-contrib/provider-digitalocean
 
 go 1.13
 

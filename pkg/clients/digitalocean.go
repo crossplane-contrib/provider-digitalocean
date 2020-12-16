@@ -27,7 +27,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
-	"github.com/khos2ow/provider-digitalocean/apis/v1alpha1"
+	"github.com/crossplane-contrib/provider-digitalocean/apis/v1alpha1"
 )
 
 // GetAuthInfo returns the necessary authentication information that is necessary

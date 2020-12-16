@@ -21,8 +21,8 @@ import (
 
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 
-	"github.com/khos2ow/provider-digitalocean/pkg/controller/compute"
-	"github.com/khos2ow/provider-digitalocean/pkg/controller/config"
+	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/compute"
+	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/config"
 )
 
 // Setup creates all DigitalOcean controllers with the supplied logger and adds them to

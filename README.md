@@ -29,7 +29,7 @@ guidelines to get started.
 ## Report a Bug
 
 For filing bugs, suggesting improvements, or requesting new features, please
-open an [issue](https://github.com/khos2ow/provider-digitalocean/issues).
+open an [issue](https://github.com/crossplane-contrib/provider-digitalocean/issues).
 
 ## Contact
 
@@ -52,4 +52,4 @@ as the core Crossplane project.
 provider-digitalocean is under the Apache 2.0 license.
 
 [![FOSSA
-Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkhos2ow%2Fprovider-digitalocean.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkhos2ow%2Fprovider-digitalocean?ref=badge_large)
+Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fcrossplane-contrib%2Fprovider-digitalocean.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fcrossplane-contrib%2Fprovider-digitalocean?ref=badge_large)
