@@ -17,6 +17,7 @@ limitations under the License.
 package compute
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/digitalocean/godo"
@@ -81,4 +82,17 @@ func LateInitializeSpec(p *v1alpha1.DropletParameters, observed godo.Droplet) {
 	p.Volumes = do.LateInitializeStringSlice(p.Volumes, observed.VolumeIDs)
 	p.Tags = do.LateInitializeStringSlice(p.Tags, observed.Tags)
 	p.VPCUUID = do.LateInitializeString(p.VPCUUID, observed.VPCUUID)
+}
+
+// IgnoreNotFound checks for response of DigitalOcean GET API call
+// and the content of returned error to ignore it if the response
+// is a '404 not found' error otherwise bubble up the error.
+func IgnoreNotFound(err error, response *godo.Response) error {
+	if err != nil && err.Error() == "dropletID is invalid because cannot be less than 1" {
+		return nil
+	}
+	if response != nil && response.StatusCode == http.StatusNotFound {
+		return nil
+	}
+	return err
 }
