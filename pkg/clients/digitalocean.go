@@ -70,6 +70,24 @@ func StringValue(v *string) string {
 	return *v
 }
 
+// Int64Value converts the supplied int64 pointer to an int, returning zero if
+// the pointer is nil.
+func Int64Value(v *int64) int64 {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+
+// IntValue converts the supplied int pointer to an int, returning zero if
+// the pointer is nil.
+func IntValue(v *int) int {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+
 // BoolValue converts the supplied bool pointer to an bool, returning false if
 // the pointer is nil.
 func BoolValue(v *bool) bool {
@@ -99,6 +117,14 @@ func LateInitializeString(s *string, from string) *string {
 
 // LateInitializeInt64 implements late initialization for int64 type.
 func LateInitializeInt64(i *int64, from int64) *int64 {
+	if i != nil || from == 0 {
+		return i
+	}
+	return &from
+}
+
+// LateInitializeInt implements late initialization for int type.
+func LateInitializeInt(i *int, from int) *int {
 	if i != nil || from == 0 {
 		return i
 	}
