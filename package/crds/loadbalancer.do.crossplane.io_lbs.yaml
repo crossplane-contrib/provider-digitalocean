@@ -1,0 +1,246 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
+  creationTimestamp: null
+  name: lbs.loadbalancer.do.crossplane.io
+spec:
+  group: loadbalancer.do.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - do
+    kind: LB
+    listKind: LBList
+    plural: lbs
+    singular: lb
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: A LB is a managed resource that represents a DigitalOcean LB.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: A LBSpec defines the desired state of a LB.
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: DeletionPolicy specifies what will happen to the underlying
+                  external when this managed resource is deleted - either "Delete"
+                  or "Orphan" the external resource.
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                description: 'LBParameters define the desired state of a DigitalOcean
+                  LoadBalancer. Most fields map directly to a LoadBalancer: https://developers.digitalocean.com/documentation/v2/#load-balancers'
+                properties:
+                  algorithm:
+                    description: 'Algorithm: The load balancing algorithm used to
+                      determine which backend Droplet will be selected by a client.
+                      It must be either "round_robin" or "least_connections".'
+                    enum:
+                    - round_robin
+                    - least_connections
+                    type: string
+                  healthCheck:
+                    description: An object specifying health check settings for the
+                      Load Balancer. If omitted, default values will be provided.
+                    properties:
+                      healthyThreshold:
+                        description: The number of times a health check must pass
+                          for a backend Droplet to be marked "healthy" and be re-added
+                          to the pool. The vaule must be between 2 and 10. If not
+                          specified, the default value is 5.
+                        maximum: 10
+                        minimum: 2
+                        type: integer
+                      interval:
+                        description: The number of seconds between between two consecutive
+                          health checks. The value must be between 3 and 300. If not
+                          specified, the default value is 10.
+                        maximum: 300
+                        minimum: 3
+                        type: integer
+                      timeout:
+                        description: The number of seconds the Load Balancer instance
+                          will wait for a response until marking a health check as
+                          failed. The value must be between 3 and 300. If not specified,
+                          the default value is 5.
+                        maximum: 300
+                        minimum: 3
+                        type: integer
+                      unhealthyThreshold:
+                        description: The number of times a health check must fail
+                          for a backend Droplet to be marked "unhealthy" and be removed
+                          from the pool. The vaule must be between 2 and 10. If not
+                          specified, the default value is 3.
+                        maximum: 10
+                        minimum: 2
+                        type: integer
+                    type: object
+                  port:
+                    description: API Server port. It must be valid ports range (1-65535).
+                      If omitted, default value is 6443.
+                    maximum: 65535
+                    minimum: 1
+                    type: integer
+                  region:
+                    description: 'Region: The unique slug identifier for the region
+                      that you wish to deploy in.'
+                    type: string
+                  tags:
+                    description: 'Tags: A flat array of tag names as strings to apply
+                      to the LB after it is created. Tag names can either be existing
+                      or new tags.'
+                    items:
+                      type: string
+                    type: array
+                  vpc_uuid:
+                    description: 'VPCUUID: A string specifying the UUID of the VPC
+                      to which the LB will be assigned. If excluded, beginning on
+                      April 7th, 2020, the LB will be assigned to your account''s
+                      default VPC for the region.'
+                    type: string
+                required:
+                - algorithm
+                - region
+                type: object
+              providerConfigRef:
+                default:
+                  name: default
+                description: ProviderConfigReference specifies how the provider that
+                  will be used to create, observe, update, and delete this managed
+                  resource should be configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              providerRef:
+                description: 'ProviderReference specifies the provider that will be
+                  used to create, observe, update, and delete this managed resource.
+                  Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: WriteConnectionSecretToReference specifies the namespace
+                  and name of a Secret to which any connection details for this managed
+                  resource should be written. Connection details frequently include
+                  the endpoint, username, and password required to connect to the
+                  managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: A LBStatus represents the observed state of a LB.
+            properties:
+              atProvider:
+                description: A LBObservation reflects the observed state of a LB on
+                  DigitalOcean.
+                properties:
+                  creationTimestamp:
+                    description: CreationTimestamp in RFC3339 text format.
+                    type: string
+                  id:
+                    description: ID for the resource. This identifier is defined by
+                      the server.
+                    type: string
+                  ip:
+                    description: IP for the resource.
+                    type: integer
+                  status:
+                    description: "A Status string indicating the state of the LB instance.
+                      \n Possible values:   \"new\"   \"active\"   \"off\""
+                    type: string
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time this condition
+                        transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A Message containing details about this condition's
+                        last transition from one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: Type of this condition. At most one of each condition
+                        type may apply to a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

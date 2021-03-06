@@ -6,8 +6,8 @@ metadata:
     crossplane.io/external-name: crossplane-droplet
 spec:
   forProvider:
-    region: sfo1
+    region: nyc1
     size: s-1vcpu-1gb
     image: ubuntu-20-04-x64
   providerConfigRef:
-    name: example
+    name: default

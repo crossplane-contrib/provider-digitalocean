@@ -145,15 +145,22 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 
 	cr.Status.SetConditions(xpv1.Creating())
 
+	name := meta.GetExternalName(cr)
+	if meta.GetExternalName(cr) == "" {
+		name = cr.GetName()
+	}
+
 	create := &godo.DropletCreateRequest{}
-	docompute.GenerateDroplet(cr.GetName(), cr.Spec.ForProvider, create)
+	docompute.GenerateDroplet(name, cr.Spec.ForProvider, create)
 
 	droplet, _, err := c.Droplets.Create(ctx, create)
 	if err != nil || droplet == nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errDropletCreateFailed)
 	}
 
-	meta.SetExternalName(cr, strconv.Itoa(droplet.ID))
+	if meta.GetExternalName(cr) == "" {
+		meta.SetExternalName(cr, strconv.Itoa(droplet.ID))
+	}
 
 	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
 }

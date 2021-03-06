@@ -1,0 +1,15 @@
+apiVersion: loadbalancer.do.crossplane.io/v1alpha1
+kind: LB
+metadata:
+  name: example-lb
+spec:
+  forProvider:
+    region: nyc1
+    algorithm: round_robin
+    healthCheck:
+      interval: 300
+      timeout: 300
+      unhealthyThreshold: 10
+      healthyThreshold: 10
+  providerConfigRef:
+    name: default

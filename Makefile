@@ -124,11 +124,6 @@ dev: $(KIND) $(KUBECTL)
 	@$(KUBECTL) apply -k https://github.com/crossplane/crossplane//cluster?ref=master
 	@$(INFO) Installing Provider DigitalOcean CRDs
 	@$(KUBECTL) apply -f $(CRD_DIR) -R
-	@$(INFO) Creating crossplane-system Namespace and installing Crossplane
-	@$(KUBECTL) create namespace crossplane-system
-	@$(HELM3) repo add crossplane-stable https://charts.crossplane.io/stable
-	@$(HELM3) repo update
-	@$(HELM3) install crossplane --namespace crossplane-system crossplane-stable/crossplane
 	@$(INFO) Starting Provider DigitalOcean controllers
 	@$(GO) run cmd/provider/main.go --debug
 
