@@ -1,0 +1,20 @@
+apiVersion: loadbalancer.do.crossplane.io/v1alpha1
+kind: DOLoadBalancer
+metadata:
+  name: test
+spec:
+  forProvider:
+    region: nyc1
+    algorithm: round_robin
+    healthCheck:
+      checkIntervalSeconds: 300
+      responseTimeoutSeconds: 300
+      port: 80
+      unhealthyThreshold: 10
+      healthyThreshold: 10
+      protocol: "tcp"
+    forwardingRules:
+      - entryProtocol: "tcp"
+        entryPort: 80
+        targetProtocol: "tcp"
+        targetPort: 80
