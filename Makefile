@@ -16,7 +16,6 @@ PLATFORMS ?= linux_amd64 linux_arm64
 
 -include build/makelib/output.mk
 
-
 # ====================================================================================
 # Setup Go
 
