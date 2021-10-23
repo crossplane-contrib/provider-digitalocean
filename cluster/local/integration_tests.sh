@@ -138,6 +138,10 @@ eval $(make --no-print-directory -C ${projectdir} build.vars)
 # ------------------------------
 
 HOSTARCH="${HOSTARCH:-amd64}"
+if [ $HOSTARCH = "x86_64" ]; then
+    HOSTARCH=amd64
+fi
+
 BUILD_IMAGE="${BUILD_REGISTRY}/${PROJECT_NAME}-${HOSTARCH}"
 CONTROLLER_IMAGE="${BUILD_REGISTRY}/${PROJECT_NAME}-controller-${HOSTARCH}"
 
