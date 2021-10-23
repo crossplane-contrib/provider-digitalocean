@@ -21,6 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	computev1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/compute/v1alpha1"
+	dbv1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/database/v1alpha1"
 	dov1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/v1alpha1"
 )
 
@@ -29,6 +30,7 @@ func init() {
 	AddToSchemes = append(AddToSchemes,
 		dov1alpha1.SchemeBuilder.AddToScheme,
 		computev1alpha1.SchemeBuilder.AddToScheme,
+		dbv1alpha1.SchemeBuilder.AddToScheme,
 	)
 }
 

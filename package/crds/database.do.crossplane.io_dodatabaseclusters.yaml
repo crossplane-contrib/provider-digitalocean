@@ -1,0 +1,315 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.0
+  creationTimestamp: null
+  name: dodatabaseclusters.database.do.crossplane.io
+spec:
+  group: database.do.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - do
+    kind: DODatabaseCluster
+    listKind: DODatabaseClusterList
+    plural: dodatabaseclusters
+    singular: dodatabasecluster
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: A DODatabaseCluster is a managed resource that represents a DigitalOcean Database Cluster.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: A DODatabaseClusterSpec defines the desired state of a Database Cluster
+            properties:
+              deletionPolicy:
+                description: DeletionPolicy specifies what will happen to the underlying external when this managed resource is deleted - either "Delete" or "Orphan" the external resource. The "Delete" policy is the default when no policy is specified.
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                description: A DODatabaseCluserParameters defines the desired state of a DigitalOcean Database Cluster. All fields map directly to a Database Cluster https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
+                properties:
+                  engine:
+                    description: 'Engine: A slug representing the database engine used for the cluster. The possible values are: "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis, and "mongodb" for MongoDB.'
+                    enum:
+                    - pq
+                    - mysql
+                    - redis
+                    - mongodb
+                    type: string
+                  numNodes:
+                    description: 'NumNodes: The number of nodes in the database cluster.'
+                    type: integer
+                  privateNetworkUUID:
+                    description: 'PrivateNetworkUUID: A string specifying the UUID of the VPC to which the database cluster will be assigned. If excluded, the cluster when creating a new database cluster, it will be assigned to your account''s default VPC for the region (Optional).'
+                    type: string
+                  region:
+                    description: 'Region: The slug identifier for the region where the database cluster is located.'
+                    type: string
+                  size:
+                    description: 'Size: The slug identifier representing the size of the nodes in the database cluster.'
+                    type: string
+                  tags:
+                    description: 'Tags: An array of tags that have been applied to the database cluster (Optional).'
+                    items:
+                      type: string
+                    type: array
+                  version:
+                    description: 'Version: A string representing the version of the database engine in use for the cluster (Optional).'
+                    type: string
+                required:
+                - engine
+                - numNodes
+                - region
+                - size
+                type: object
+              providerConfigRef:
+                description: ProviderConfigReference specifies how the provider that will be used to create, observe, update, and delete this managed resource should be configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              providerRef:
+                description: 'ProviderReference specifies the provider that will be used to create, observe, update, and delete this managed resource. Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: WriteConnectionSecretToReference specifies the namespace and name of a Secret to which any connection details for this managed resource should be written. Connection details frequently include the endpoint, username, and password required to connect to the managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: A DODatabaseClusterStatus represents the observed state of a Database Cluster
+            properties:
+              atProvider:
+                description: A DODatabaseClusterObservation reflects the observed state of a Database Cluster on DigitalOcean. https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
+                properties:
+                  connection:
+                    description: A DODatabaseClusterConnection defines the connection information for a Database Cluster.
+                    properties:
+                      database:
+                        description: The name of the default database.
+                        type: string
+                      host:
+                        description: The FQDN pointing to the database cluster's current primary node.
+                        type: string
+                      password:
+                        description: The randomly generated password for the default user.
+                        type: string
+                      port:
+                        description: The port on which the database cluster is listening.
+                        type: integer
+                      ssl:
+                        description: A boolean value indicating if the connection should be made over SSL.
+                        type: boolean
+                      uri:
+                        description: A connection string in the format accepted by the psql command. This is provided as a convenience and should be able to be constructed by the other attributes.
+                        type: string
+                      user:
+                        description: The default user for the database.
+                        type: string
+                    type: object
+                  createdAt:
+                    description: A time value given in ISO8601 combined date and time format that represents when the database cluster was created.
+                    type: string
+                  dbNames:
+                    description: An array of strings containing the names of databases created in the database cluster.
+                    items:
+                      type: string
+                    type: array
+                  engine:
+                    description: 'A slug representing the database engine used for the cluster. The possible values are: "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis, and "mongodb" for MongoDB'
+                    type: string
+                  id:
+                    description: A unique ID that can be used to identify and reference a database cluster.
+                    type: string
+                  maintenanceWindow:
+                    description: A DODatabaseClusterMaintenanceWindow defines a Database Cluster Maintenance Window.
+                    properties:
+                      day:
+                        description: The day of the week on which to apply maintenance updates.
+                        type: string
+                      description:
+                        description: A list of strings, each containing information about a pending maintenance update.
+                        items:
+                          type: string
+                        type: array
+                      hour:
+                        description: The hour in UTC at which maintenance updates will be applied in 24 hour format.
+                        type: string
+                      pending:
+                        description: A boolean value indicating whether any maintenance is scheduled to be performed in the next window.
+                        type: boolean
+                    required:
+                    - day
+                    - hour
+                    type: object
+                  name:
+                    description: A unique, human-readable name referring to a database cluster.
+                    type: string
+                  numNodes:
+                    description: The number of nodes in the database cluster.
+                    type: integer
+                  private_connection:
+                    description: A DODatabaseClusterConnection defines the connection information for a Database Cluster.
+                    properties:
+                      database:
+                        description: The name of the default database.
+                        type: string
+                      host:
+                        description: The FQDN pointing to the database cluster's current primary node.
+                        type: string
+                      password:
+                        description: The randomly generated password for the default user.
+                        type: string
+                      port:
+                        description: The port on which the database cluster is listening.
+                        type: integer
+                      ssl:
+                        description: A boolean value indicating if the connection should be made over SSL.
+                        type: boolean
+                      uri:
+                        description: A connection string in the format accepted by the psql command. This is provided as a convenience and should be able to be constructed by the other attributes.
+                        type: string
+                      user:
+                        description: The default user for the database.
+                        type: string
+                    type: object
+                  privateNetworkUUID:
+                    description: A string specifying the UUID of the VPC to which the database cluster will be assigned. If excluded, the cluster when creating a new database cluster, it will be assigned to your account's default VPC for the region.
+                    type: string
+                  region:
+                    description: The slug identifier for the region where the database cluster is located.
+                    type: string
+                  size:
+                    description: The slug identifier representing the size of the nodes in the database cluster.
+                    type: string
+                  status:
+                    description: "A string representing the current status of the database cluster. \n Possible values: \t\"creating\" \t\"online\" \t\"resizing\" \t\"migrating\" \t\"forking\""
+                    type: string
+                  tags:
+                    description: An array of tags that have been applied to the database cluster.
+                    items:
+                      type: string
+                    type: array
+                  users:
+                    items:
+                      description: The DODatabaseClusterUser defines a Database Cluster User.
+                      properties:
+                        mySQLSettings:
+                          description: Represents the MySQL Settings of a user for a DigitalOcean Database Cluster
+                          properties:
+                            authPlugin:
+                              description: A string specifying the authentication method to be used for connections to the MySQL user account. The valid values are mysql_native_password or caching_sha2_password. If excluded when creating a new user, the default for the version of MySQL in use will be used. As of MySQL 8.0, the default is caching_sha2_password.
+                              type: string
+                          required:
+                          - authPlugin
+                          type: object
+                        name:
+                          type: string
+                        password:
+                          description: A randomly generated password for the database user.
+                          type: string
+                        role:
+                          description: A string representing the database user's role. The value will be either "primary" or "normal".
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  version:
+                    description: A string representing the version of the database engine in use for the cluster.
+                    type: string
+                required:
+                - engine
+                - name
+                - numNodes
+                - private_connection
+                - region
+                - size
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time this condition transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A Message containing details about this condition's last transition from one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True, False, or Unknown?
+                      type: string
+                    type:
+                      description: Type of this condition. At most one of each condition type may apply to a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        - status
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
