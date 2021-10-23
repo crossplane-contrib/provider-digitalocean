@@ -67,10 +67,11 @@ cobertura:
 		grep -v zz_generated.deepcopy | \
 		$(GOCOVER_COBERTURA) > $(GO_TEST_OUTPUT)/cobertura-coverage.xml
 
+CRD_DIR=package/crds
 crds.clean:
 	@$(INFO) cleaning generated CRDs
-	@find package/crds -name *.yaml -exec sed -i.sed -e '1,2d' {} \; || $(FAIL)
-	@find package/crds -name *.yaml.sed -delete || $(FAIL)
+	@find $(CRD_DIR) -name *.yaml -exec sed -i.sed -e '1,2d' {} \; || $(FAIL)
+	@find $(CRD_DIR) -name *.yaml.sed -delete || $(FAIL)
 	@$(OK) cleaned generated CRDs
 
 generate: crds.clean
@@ -109,6 +110,28 @@ run: go.build
 	@$(INFO) Running Crossplane locally out-of-cluster . . .
 	@# To see other arguments that can be provided, run the command with --help instead
 	$(GO_OUT_DIR)/provider --debug
+
+dev: $(KIND) $(KUBECTL)
+	@$(INFO) Creating kind cluster
+	@$(KIND) create cluster --name=provider-digitalocean-dev
+	@$(KUBECTL) cluster-info --context kind-provider-digitalocean-dev
+	@$(INFO) Installing Crossplane CRDs
+	@$(KUBECTL) apply -k https://github.com/crossplane/crossplane//cluster?ref=master
+	@$(INFO) Installing Provider DigitalOcean CRDs
+	@$(KUBECTL) apply -f $(CRD_DIR) -R
+	@$(INFO) Creating crossplane-system Namespace and installing Crossplane
+	@$(KUBECTL) create namespace crossplane-system
+	@$(HELM3) repo add crossplane-stable https://charts.crossplane.io/stable
+	@$(HELM3) repo update
+	@$(HELM3) install crossplane --namespace crossplane-system crossplane-stable/crossplane
+	@$(INFO) Starting Provider DigitalOcean controllers
+	@$(GO) run cmd/provider/main.go --debug
+
+dev-clean: $(KIND) $(KUBECTL)
+	@$(INFO) Deleting kind cluster
+	@$(KIND) delete cluster --name=provider-digitalocean-dev
+
+dev-restart: dev-clean dev
 
 .PHONY: cobertura reviewable manifests submodules fallthrough test-integration run crds.clean
 

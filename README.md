@@ -26,6 +26,8 @@ the Crossplane
 [Contributing](https://github.com/crossplane/crossplane/blob/master/CONTRIBUTING.md)
 guidelines to get started.
 
+We also have a local [Contributing](docs/CONTRIBUTING.md) document to help you get your local environment setup to contribute.
+
 ## Report a Bug
 
 For filing bugs, suggesting improvements, or requesting new features, please
