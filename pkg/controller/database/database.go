@@ -48,13 +48,13 @@ const (
 // SetupDatabase adds a controller that reconciles Database managed
 // resources.
 func SetupDatabase(mgr ctrl.Manager, l logging.Logger) error {
-	name := managed.ControllerName(v1alpha1.LBGroupKind)
+	name := managed.ControllerName(v1alpha1.DBGroupKind)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		Named(name).
 		For(&v1alpha1.DODatabaseCluster{}).
 		Complete(managed.NewReconciler(mgr,
-			resource.ManagedKind(v1alpha1.LBGroupVersionKind),
+			resource.ManagedKind(v1alpha1.DBGroupVersionKind),
 			managed.WithExternalConnecter(&dbConnector{kube: mgr.GetClient()}),
 			managed.WithReferenceResolver(managed.NewAPISimpleReferenceResolver(mgr.GetClient())),
 			managed.WithConnectionPublishers(),

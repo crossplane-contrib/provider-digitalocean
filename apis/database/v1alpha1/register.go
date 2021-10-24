@@ -34,12 +34,12 @@ var (
 	SchemeBuilder = &scheme.Builder{GroupVersion: SchemeGroupVersion}
 )
 
-// LB type metadata.
+// DB type metadata.
 var (
-	LBKind             = reflect.TypeOf(DODatabaseCluster{}).Name()
-	LBGroupKind        = schema.GroupKind{Group: Group, Kind: LBKind}.String()
-	LBKindAPIVersion   = LBKind + "." + SchemeGroupVersion.String()
-	LBGroupVersionKind = SchemeGroupVersion.WithKind(LBKind)
+	DBKind             = reflect.TypeOf(DODatabaseCluster{}).Name()
+	DBGroupKind        = schema.GroupKind{Group: Group, Kind: DBKind}.String()
+	DBKindAPIVersion   = DBKind + "." + SchemeGroupVersion.String()
+	DBGroupVersionKind = SchemeGroupVersion.WithKind(DBKind)
 )
 
 func init() {
