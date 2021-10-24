@@ -23,7 +23,7 @@ import (
 )
 
 // GenerateDatabase generates *godo.DatabaseRequest instance from LBParameters.
-func GenerateDatabase(name string, in v1alpha1.DODatabaseCluserParameters, create *godo.DatabaseCreateRequest) {
+func GenerateDatabase(name string, in v1alpha1.DODatabaseClusterParameters, create *godo.DatabaseCreateRequest) {
 	create.Name = name
 	create.EngineSlug = do.StringValue(in.Engine)
 	create.Version = do.StringValue(in.Version)
@@ -37,7 +37,7 @@ func GenerateDatabase(name string, in v1alpha1.DODatabaseCluserParameters, creat
 // LateInitializeSpec updates any unset (i.e. nil) optional fields of the
 // supplied LBParameters that are set (i.e. non-zero) on the supplied
 // LB.
-func LateInitializeSpec(p *v1alpha1.DODatabaseCluserParameters, observed godo.Database) {
+func LateInitializeSpec(p *v1alpha1.DODatabaseClusterParameters, observed godo.Database) {
 	p.Version = do.LateInitializeString(p.Version, observed.EngineSlug)
 	p.PrivateNetworkUUID = do.LateInitializeString(p.PrivateNetworkUUID, observed.PrivateNetworkUUID)
 

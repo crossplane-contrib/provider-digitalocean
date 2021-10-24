@@ -239,7 +239,7 @@ spec:
                       description: The DODatabaseClusterUser defines a Database Cluster User.
                       properties:
                         mySQLSettings:
-                          description: Represents the MySQL Settings of a user for a DigitalOcean Database Cluster
+                          description: DODatabaseUserMySQLSettings Represents the MySQL Settings of a user for a DigitalOcean Database Cluster
                           properties:
                             authPlugin:
                               description: A string specifying the authentication method to be used for connections to the MySQL user account. The valid values are mysql_native_password or caching_sha2_password. If excluded when creating a new user, the default for the version of MySQL in use will be used. As of MySQL 8.0, the default is caching_sha2_password.
@@ -301,7 +301,6 @@ spec:
             type: object
         required:
         - spec
-        - status
         type: object
     served: true
     storage: true

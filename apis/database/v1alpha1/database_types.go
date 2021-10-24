@@ -31,7 +31,7 @@ const (
 // A DODatabaseCluserParameters defines the desired state of a DigitalOcean Database Cluster.
 // All fields map directly to a Database Cluster
 // https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
-type DODatabaseCluserParameters struct {
+type DODatabaseClusterParameters struct {
 	// Engine: A slug representing the database engine used for the cluster. The possible values are: "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis, and "mongodb" for MongoDB.
 	// +kubebuilder:validation:Enum="pq";"mysql";"redis";"mongodb"
 	// +immutable
@@ -186,7 +186,7 @@ type DODatabaseClusterMaintenanceWindow struct {
 // A DODatabaseClusterSpec defines the desired state of a Database Cluster
 type DODatabaseClusterSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       DODatabaseCluserParameters `json:"forProvider"`
+	ForProvider       DODatabaseClusterParameters `json:"forProvider"`
 }
 
 // A DODatabaseClusterStatus represents the observed state of a Database Cluster
@@ -207,7 +207,7 @@ type DODatabaseCluster struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   DODatabaseClusterSpec   `json:"spec"`
-	Status DODatabaseClusterStatus `json:"status"`
+	Status DODatabaseClusterStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
