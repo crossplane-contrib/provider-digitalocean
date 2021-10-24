@@ -33,7 +33,7 @@ const (
 // https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
 type DODatabaseClusterParameters struct {
 	// Engine: A slug representing the database engine used for the cluster. The possible values are: "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis, and "mongodb" for MongoDB.
-	// +kubebuilder:validation:Enum="pq";"mysql";"redis";"mongodb"
+	// +kubebuilder:validation:Enum="pg";"mysql";"redis";"mongodb"
 	// +immutable
 	Engine *string `json:"engine"`
 

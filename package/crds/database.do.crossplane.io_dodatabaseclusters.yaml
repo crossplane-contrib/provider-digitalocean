@@ -50,12 +50,12 @@ spec:
                 - Delete
                 type: string
               forProvider:
-                description: A DODatabaseCluserParameters defines the desired state of a DigitalOcean Database Cluster. All fields map directly to a Database Cluster https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
+                description: A DODatabaseClusterParameters defines the desired state of a DigitalOcean Database Cluster. All fields map directly to a Database Cluster https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
                 properties:
                   engine:
                     description: 'Engine: A slug representing the database engine used for the cluster. The possible values are: "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis, and "mongodb" for MongoDB.'
                     enum:
-                    - pq
+                    - pg
                     - mysql
                     - redis
                     - mongodb
