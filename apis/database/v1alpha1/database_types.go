@@ -28,7 +28,7 @@ const (
 	StatusForking   = "forking"
 )
 
-// A DODatabaseCluserParameters defines the desired state of a DigitalOcean Database Cluster.
+// A DODatabaseClusterParameters defines the desired state of a DigitalOcean Database Cluster.
 // All fields map directly to a Database Cluster
 // https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
 type DODatabaseClusterParameters struct {
