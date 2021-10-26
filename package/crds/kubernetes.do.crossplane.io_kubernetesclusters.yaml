@@ -1,0 +1,541 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
+  creationTimestamp: null
+  name: kubernetesclusters.kubernetes.do.crossplane.io
+spec:
+  group: kubernetes.do.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - do
+    kind: KubernetesCluster
+    listKind: KubernetesClusterList
+    plural: kubernetesclusters
+    singular: kubernetescluster
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: A KubernetesCluster is a managed resource that represents a DigitalOcean
+          Kubernetes Cluster.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: A KubernetesClusterSpec defines the desired state of a KubernetesCluster.
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: DeletionPolicy specifies what will happen to the underlying
+                  external when this managed resource is deleted - either "Delete"
+                  or "Orphan" the external resource.
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                description: KubernetesClusterParameters define the desired state
+                  of a DigitalOcean Kubernetes Cluster Most fields map directly to
+                  a KubernetesCluster. See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
+                properties:
+                  autoUpgrade:
+                    description: A boolean value indicating whether the cluster will
+                      be automatically upgraded to new patch releases during its maintenance
+                      window.
+                    type: boolean
+                  highlyAvailable:
+                    description: A boolean value indicating whether the control plane
+                      is run in a highly available configuration in the cluster. Highly
+                      available control planes incur less downtime.
+                    type: boolean
+                  maintenancePolicy:
+                    description: An object specifying the maintenance window policy
+                      for the Kubernetes cluster.
+                    properties:
+                      day:
+                        description: The day of the maintenance window policy. May
+                          be one of monday through sunday, or any to indicate an arbitrary
+                          week day.
+                        type: string
+                      startTime:
+                        description: The start time in UTC of the maintenance window
+                          policy in 24-hour clock format / HH:MM notation (e.g., 15:00).
+                        type: string
+                    type: object
+                  name:
+                    description: A human-readable name for a Kubernetes cluster.
+                    type: string
+                  nodePools:
+                    description: An array of objects specifying the details of the
+                      worker nodes available to the Kubernetes cluster.
+                    items:
+                      properties:
+                        autoScale:
+                          description: A boolean value indicating whether auto-scaling
+                            is enabled for this node pool.
+                          type: boolean
+                        count:
+                          description: The number of Droplet instances in the node
+                            pool.
+                          type: integer
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: An object containing a set of Kubernetes labels.
+                            The keys and are values are both user-defined.
+                          type: object
+                        maxNodes:
+                          description: The maximum number of nodes that this node
+                            pool can be auto-scaled to. The value will be 0 if auto_scale
+                            is set to false.
+                          type: integer
+                        minNodes:
+                          description: The minimum number of nodes that this node
+                            pool can be auto-scaled to. The value will be 0 if auto_scale
+                            is set to false.
+                          type: integer
+                        name:
+                          description: A human-readable name for the node pool.
+                          type: string
+                        size:
+                          description: The slug identifier for the type of Droplet
+                            used as workers in the node pool.
+                          type: string
+                        tags:
+                          description: An array containing the tags applied to the
+                            node pool. All node pools are automatically tagged k8s,
+                            k8s-worker, and k8s:$K8S_CLUSTER_ID.
+                          items:
+                            type: string
+                          type: array
+                        taints:
+                          description: An array of taints to apply to all nodes in
+                            a pool.
+                          items:
+                            description: KubernetesNodePoolTaint represents a Kubernetes
+                              Node Pool Taint. Taints will automatically be applied
+                              to all existing nodes and any subsequent nodes added
+                              to the pool. When a taint is removed, it is removed
+                              from all nodes in the pool
+                            properties:
+                              effect:
+                                description: How the node reacts to pods that it won't
+                                  tolerate. Available effect values are NoSchedule,
+                                  PreferNoSchedule, and NoExecute.
+                                type: string
+                              key:
+                                description: An arbitrary string. The key and value
+                                  fields of the taint object form a key-value pair.
+                                  For example, if the value of the key field is "special"
+                                  and the value of the value field is "gpu", the key
+                                  value pair would be special=gpu.
+                                type: string
+                              value:
+                                description: An arbitrary string. The key and value
+                                  fields of the taint object form a key-value pair.
+                                  For example, if the value of the key field is "special"
+                                  and the value of the value field is "gpu", the key
+                                  value pair would be special=gpu.
+                                type: string
+                            type: object
+                          type: array
+                      required:
+                      - count
+                      - name
+                      - size
+                      type: object
+                    type: array
+                  region:
+                    description: The slug identifier for the region where the Kubernetes
+                      cluster is located.
+                    type: string
+                  surgeUpgrade:
+                    description: A boolean value indicating whether surge upgrade
+                      is enabled/disabled for the cluster. Surge upgrade makes cluster
+                      upgrades fast and reliable by bringing up new nodes before destroying
+                      the outdated nodes.
+                    type: boolean
+                  tags:
+                    description: An array of tags applied to the Kubernetes cluster.
+                      All clusters are automatically tagged k8s and k8s:$K8S_CLUSTER_ID.
+                    items:
+                      type: string
+                    type: array
+                  version:
+                    description: The slug identifier for the version of Kubernetes
+                      used for the cluster. If set to a minor version (e.g. "1.14"),
+                      the latest version within it will be used (e.g. "1.14.6-do.1");
+                      if set to "latest", the latest published version will be used.
+                      See the /v2/kubernetes/options endpoint to find all currently
+                      available versions.
+                    type: string
+                  vpcuui:
+                    description: A string specifying the UUID of the VPC to which
+                      the Kubernetes cluster is assigned.
+                    type: string
+                required:
+                - name
+                - nodePools
+                - region
+                - version
+                type: object
+              providerConfigRef:
+                default:
+                  name: default
+                description: ProviderConfigReference specifies how the provider that
+                  will be used to create, observe, update, and delete this managed
+                  resource should be configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              providerRef:
+                description: 'ProviderReference specifies the provider that will be
+                  used to create, observe, update, and delete this managed resource.
+                  Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: WriteConnectionSecretToReference specifies the namespace
+                  and name of a Secret to which any connection details for this managed
+                  resource should be written. Connection details frequently include
+                  the endpoint, username, and password required to connect to the
+                  managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: A KubernetesClusterStatus represents the observed state of
+              a KubernetesCluster.
+            properties:
+              atProvider:
+                description: A KubernetesClusterObservation reflects the observed
+                  state of a KubernetesCluster on DigitalOcean. See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
+                properties:
+                  autoUpgrade:
+                    description: A boolean value indicating whether the cluster will
+                      be automatically upgraded to new patch releases during its maintenance
+                      window.
+                    type: boolean
+                  clusterSubnet:
+                    description: The range of IP addresses in the overlay network
+                      of the Kubernetes cluster in CIDR notation.
+                    type: string
+                  createdAt:
+                    description: A time value given in ISO8601 combined date and time
+                      format that represents when the Kubernetes cluster was created.
+                    type: string
+                  endpoint:
+                    description: The base URL of the API server on the Kubernetes
+                      master node.
+                    type: string
+                  highlyAvailable:
+                    description: A boolean value indicating whether the control plane
+                      is run in a highly available configuration in the cluster. Highly
+                      available control planes incur less downtime.
+                    type: boolean
+                  id:
+                    description: ID for the resource. This identifier is defined by
+                      the server.
+                    type: string
+                  ipv4:
+                    description: The public IPv4 address of the Kubernetes master
+                      node.
+                    type: string
+                  maintenancePolicy:
+                    description: An object specifying the maintenance window policy
+                      for the Kubernetes cluster.
+                    properties:
+                      day:
+                        description: The day of the maintenance window policy. May
+                          be one of monday through sunday, or any to indicate an arbitrary
+                          week day.
+                        type: string
+                      duration:
+                        description: The duration of the maintenance window policy
+                          in human-readable format.
+                        type: string
+                      startTime:
+                        description: The start time in UTC of the maintenance window
+                          policy in 24-hour clock format / HH:MM notation (e.g., 15:00).
+                        type: string
+                    type: object
+                  name:
+                    description: A human-readable name for a Kubernetes cluster.
+                    type: string
+                  nodePools:
+                    description: An array of objects specifying the details of the
+                      worker nodes available to the Kubernetes cluster.
+                    items:
+                      properties:
+                        autoScale:
+                          description: A boolean value indicating whether auto-scaling
+                            is enabled for this node pool.
+                          type: boolean
+                        count:
+                          description: The number of Droplet instances in the node
+                            pool.
+                          type: integer
+                        id:
+                          description: A unique ID that can be used to identify and
+                            reference a specific node pool.
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: An object containing a set of Kubernetes labels.
+                            The keys and are values are both user-defined.
+                          type: object
+                        maxNodes:
+                          description: The maximum number of nodes that this node
+                            pool can be auto-scaled to. The value will be 0 if auto_scale
+                            is set to false.
+                          type: integer
+                        minNodes:
+                          description: The minimum number of nodes that this node
+                            pool can be auto-scaled to. The value will be 0 if auto_scale
+                            is set to false.
+                          type: integer
+                        name:
+                          description: A human-readable name for the node pool.
+                          type: string
+                        nodes:
+                          description: An object specifying the details of a specific
+                            worker node in a node pool.
+                          items:
+                            properties:
+                              createdAt:
+                                description: A time value given in ISO8601 combined
+                                  date and time format that represents when the node
+                                  was created.
+                                type: string
+                              dropletID:
+                                description: The ID of the Droplet used for the worker
+                                  node.
+                                type: string
+                              id:
+                                description: A unique ID that can be used to identify
+                                  and reference the node.
+                                type: string
+                              name:
+                                description: An automatically generated, human-readable
+                                  name for the node.
+                                type: string
+                              status:
+                                description: An object containing a state attribute
+                                  whose value is set to a string indicating the current
+                                  status of the node.
+                                properties:
+                                  message:
+                                    description: A message relating to the current
+                                      state
+                                    type: string
+                                  state:
+                                    description: A string indicating the current status
+                                      of the node.
+                                    type: string
+                                type: object
+                              updatedAt:
+                                description: A time value given in ISO8601 combined
+                                  date and time format that represents when the node
+                                  was last updated.
+                                type: string
+                            type: object
+                          type: array
+                        size:
+                          description: The slug identifier for the type of Droplet
+                            used as workers in the node pool.
+                          type: string
+                        tags:
+                          description: An array containing the tags applied to the
+                            node pool. All node pools are automatically tagged k8s,
+                            k8s-worker, and k8s:$K8S_CLUSTER_ID.
+                          items:
+                            type: string
+                          type: array
+                        taints:
+                          description: An array of taints to apply to all nodes in
+                            a pool.
+                          items:
+                            description: KubernetesNodePoolTaint represents a Kubernetes
+                              Node Pool Taint. Taints will automatically be applied
+                              to all existing nodes and any subsequent nodes added
+                              to the pool. When a taint is removed, it is removed
+                              from all nodes in the pool
+                            properties:
+                              effect:
+                                description: How the node reacts to pods that it won't
+                                  tolerate. Available effect values are NoSchedule,
+                                  PreferNoSchedule, and NoExecute.
+                                type: string
+                              key:
+                                description: An arbitrary string. The key and value
+                                  fields of the taint object form a key-value pair.
+                                  For example, if the value of the key field is "special"
+                                  and the value of the value field is "gpu", the key
+                                  value pair would be special=gpu.
+                                type: string
+                              value:
+                                description: An arbitrary string. The key and value
+                                  fields of the taint object form a key-value pair.
+                                  For example, if the value of the key field is "special"
+                                  and the value of the value field is "gpu", the key
+                                  value pair would be special=gpu.
+                                type: string
+                            type: object
+                          type: array
+                      required:
+                      - count
+                      - name
+                      - size
+                      type: object
+                    type: array
+                  region:
+                    description: The slug identifier for the region where the Kubernetes
+                      cluster is located.
+                    type: string
+                  registryEnabled:
+                    description: A read-only boolean value indicating if a container
+                      registry is integrated with the cluster.
+                    type: boolean
+                  serviceSubnet:
+                    description: The range of assignable IP addresses for services
+                      running in the Kubernetes cluster in CIDR notation.
+                    type: string
+                  status:
+                    description: An object containing a state attribute whose value
+                      is set to a string indicating the current status of the cluster.
+                    properties:
+                      message:
+                        description: A message relating to the current state
+                        type: string
+                      state:
+                        description: A string indicating the current status of the
+                          node.
+                        type: string
+                    type: object
+                  surgeUpgrade:
+                    description: A boolean value indicating whether surge upgrade
+                      is enabled/disabled for the cluster. Surge upgrade makes cluster
+                      upgrades fast and reliable by bringing up new nodes before destroying
+                      the outdated nodes.
+                    type: boolean
+                  tags:
+                    description: An array of tags applied to the Kubernetes cluster.
+                      All clusters are automatically tagged k8s and k8s:$K8S_CLUSTER_ID.
+                    items:
+                      type: string
+                    type: array
+                  updatedAt:
+                    description: A time value given in ISO8601 combined date and time
+                      format that represents when the Kubernetes cluster was last
+                      updated.
+                    type: string
+                  version:
+                    description: The slug identifier for the version of Kubernetes
+                      used for the cluster. If set to a minor version (e.g. "1.14"),
+                      the latest version within it will be used (e.g. "1.14.6-do.1");
+                      if set to "latest", the latest published version will be used.
+                      See the /v2/kubernetes/options endpoint to find all currently
+                      available versions.
+                    type: string
+                  vpcuuid:
+                    description: A string specifying the UUID of the VPC to which
+                      the Kubernetes cluster is assigned.
+                    type: string
+                required:
+                - name
+                - nodePools
+                - region
+                - version
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time this condition
+                        transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A Message containing details about this condition's
+                        last transition from one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: Type of this condition. At most one of each condition
+                        type may apply to a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
