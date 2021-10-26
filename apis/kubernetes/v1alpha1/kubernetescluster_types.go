@@ -22,10 +22,21 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 )
 
-// KubernetesClusterParameters define the desired state of a DigitalOcean Kubernetes Cluster
+// Known Kubernetes Cluster Statuses
+const (
+	StatusRunning      = "running"
+	StatusProvisioning = "provisioning"
+	StatusDegraded     = "degraded"
+	StatusError        = "error"
+	StatusDeleted      = "deleted"
+	StatusUpgrading    = "upgrading"
+	StatusDeleting     = "deleting"
+)
+
+// DOKubernetesClusterParameters define the desired state of a DigitalOcean Kubernetes Cluster
 // Most fields map directly to a KubernetesCluster.
 // See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
-type KubernetesClusterParameters struct {
+type DOKubernetesClusterParameters struct {
 	// A human-readable name for a Kubernetes cluster.
 	Name string `json:"name"`
 
@@ -66,9 +77,9 @@ type KubernetesClusterParameters struct {
 	HighlyAvailable bool `json:"highlyAvailable,omitempty"`
 }
 
-// A KubernetesClusterObservation reflects the observed state of a KubernetesCluster on DigitalOcean.
+// DOKubernetesClusterObservation reflects the observed state of a KubernetesCluster on DigitalOcean.
 // See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
-type KubernetesClusterObservation struct {
+type DOKubernetesClusterObservation struct {
 	// ID for the resource. This identifier is defined by the server.
 	ID string `json:"id,omitempty"`
 
@@ -130,6 +141,7 @@ type KubernetesClusterObservation struct {
 	RegistryEnabled bool `json:"registryEnabled,omitempty"`
 }
 
+// KubernetesNodePool represents a node pool that makes up a Kubernetes Cluster
 type KubernetesNodePool struct {
 	// The slug identifier for the type of Droplet used as workers in the node pool.
 	Size string `json:"size"`
@@ -165,9 +177,10 @@ type KubernetesNodePool struct {
 	MaxNodes int `json:"maxNodes,omitempty"`
 }
 
+// KubernetesNodePoolObservation represents the observed state of KubernetesNodePool
 type KubernetesNodePoolObservation struct {
 	// A unique ID that can be used to identify and reference a specific node pool.
-	Id string `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 
 	NodePool KubernetesNodePool `json:",inline"`
 
@@ -190,15 +203,16 @@ type KubernetesNodePoolTaint struct {
 	// +kubebuilder:validation:Optional
 	Value string `json:"value,omitempty"`
 
-	//How the node reacts to pods that it won't tolerate. Available effect values are NoSchedule, PreferNoSchedule, and NoExecute.
+	// How the node reacts to pods that it won't tolerate. Available effect values are NoSchedule, PreferNoSchedule, and NoExecute.
 	// +kubebuilder:validation:Optional
 	Effect string `json:"effect,omitempty"`
 }
 
+// KubernetesNode represents a Node inside of a KubernetesNodePool
 type KubernetesNode struct {
 	// A unique ID that can be used to identify and reference the node.
 	// +kubebuilder:validation:Optional
-	Id string `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 
 	// An automatically generated, human-readable name for the node.
 	// +kubebuilder:validation:Optional
@@ -210,7 +224,7 @@ type KubernetesNode struct {
 
 	// The ID of the Droplet used for the worker node.
 	// +kubebuilder:validation:Optional
-	DropletId string `json:"dropletID,omitempty"`
+	DropletID string `json:"dropletID,omitempty"`
 
 	// A time value given in ISO8601 combined date and time format that represents when the node was created.
 	// +kubebuilder:validation:Optional
@@ -221,6 +235,7 @@ type KubernetesNode struct {
 	UpdatedAt string `json:"updatedAt,omitempty"`
 }
 
+// KubernetesClusterMaintenancePolicy represents a Maintenance Policy to be applied to a Kubernetes Cluster on DigitalOcean
 type KubernetesClusterMaintenancePolicy struct {
 	// The start time in UTC of the maintenance window policy in 24-hour clock format / HH:MM notation (e.g., 15:00).
 	// +kubebuilder:validation:Optional
@@ -231,6 +246,7 @@ type KubernetesClusterMaintenancePolicy struct {
 	Day string `json:"day,omitempty"`
 }
 
+// KubernetesClusterMaintenancePolicyObservation is the observed state of KubernetesClusterMaintenancePolicy
 type KubernetesClusterMaintenancePolicyObservation struct {
 	Policy KubernetesClusterMaintenancePolicy `json:",inline"`
 
@@ -239,6 +255,7 @@ type KubernetesClusterMaintenancePolicyObservation struct {
 	Duration string `json:"duration,omitempty"`
 }
 
+// KubernetesStatus represents the status of a Kubernetes Cluster
 type KubernetesStatus struct {
 	// A string indicating the current status of the node.
 	// +kubebuilder:validation:Optional
@@ -249,38 +266,38 @@ type KubernetesStatus struct {
 	Message string `json:"message,omitempty"`
 }
 
-// A KubernetesClusterSpec defines the desired state of a KubernetesCluster.
-type KubernetesClusterSpec struct {
+// A DOKubernetesClusterSpec defines the desired state of a KubernetesCluster.
+type DOKubernetesClusterSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       KubernetesClusterParameters `json:"forProvider"`
+	ForProvider       DOKubernetesClusterParameters `json:"forProvider"`
 }
 
-// A KubernetesClusterStatus represents the observed state of a KubernetesCluster.
-type KubernetesClusterStatus struct {
+// A DOKubernetesClusterStatus represents the observed state of a KubernetesCluster.
+type DOKubernetesClusterStatus struct {
 	xpv1.ResourceStatus `json:",inline"`
-	AtProvider          KubernetesClusterObservation `json:"atProvider,omitempty"`
+	AtProvider          DOKubernetesClusterObservation `json:"atProvider,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// A KubernetesCluster is a managed resource that represents a DigitalOcean Kubernetes Cluster.
+// A DOKubernetesCluster is a managed resource that represents a DigitalOcean Kubernetes Cluster.
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,categories={crossplane,managed,do}
-type KubernetesCluster struct {
+type DOKubernetesCluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   KubernetesClusterSpec   `json:"spec"`
-	Status KubernetesClusterStatus `json:"status,omitempty"`
+	Spec   DOKubernetesClusterSpec   `json:"spec"`
+	Status DOKubernetesClusterStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// KubernetesClusterList contains a list of KubernetesClusters.
-type KubernetesClusterList struct {
+// DOKubernetesClusterList contains a list of KubernetesClusters.
+type DOKubernetesClusterList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []KubernetesCluster `json:"items"`
+	Items           []DOKubernetesCluster `json:"items"`
 }

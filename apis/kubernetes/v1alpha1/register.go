@@ -39,12 +39,12 @@ var (
 
 // KubernetesCluster type metadata.
 var (
-	KubernetesClusterKind             = reflect.TypeOf(KubernetesCluster{}).Name()
-	KubernetesClusterGroupKind        = schema.GroupKind{Group: Group, Kind: KubernetesClusterKind}.String()
-	KubernetesClusterKindAPIVersion   = KubernetesClusterKind + "." + SchemeGroupVersion.String()
-	KubernetesClusterGroupVersionKind = SchemeGroupVersion.WithKind(KubernetesClusterKind)
+	DOKubernetesClusterKind             = reflect.TypeOf(DOKubernetesCluster{}).Name()
+	DOKubernetesClusterGroupKind        = schema.GroupKind{Group: Group, Kind: DOKubernetesClusterKind}.String()
+	DOKubernetesClusterKindAPIVersion   = DOKubernetesClusterKind + "." + SchemeGroupVersion.String()
+	DOKubernetesClusterGroupVersionKind = SchemeGroupVersion.WithKind(DOKubernetesClusterKind)
 )
 
 func init() {
-	SchemeBuilder.Register(&KubernetesCluster{}, &KubernetesClusterList{})
+	SchemeBuilder.Register(&DOKubernetesCluster{}, &DOKubernetesClusterList{})
 }

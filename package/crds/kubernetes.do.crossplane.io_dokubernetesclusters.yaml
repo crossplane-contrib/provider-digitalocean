@@ -6,7 +6,7 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
-  name: kubernetesclusters.kubernetes.do.crossplane.io
+  name: dokubernetesclusters.kubernetes.do.crossplane.io
 spec:
   group: kubernetes.do.crossplane.io
   names:
@@ -14,10 +14,10 @@ spec:
     - crossplane
     - managed
     - do
-    kind: KubernetesCluster
-    listKind: KubernetesClusterList
-    plural: kubernetesclusters
-    singular: kubernetescluster
+    kind: DOKubernetesCluster
+    listKind: DOKubernetesClusterList
+    plural: dokubernetesclusters
+    singular: dokubernetescluster
   scope: Cluster
   versions:
   - additionalPrinterColumns:
@@ -93,6 +93,8 @@ spec:
                     description: An array of objects specifying the details of the
                       worker nodes available to the Kubernetes cluster.
                     items:
+                      description: KubernetesNodePool represents a node pool that
+                        makes up a Kubernetes Cluster
                       properties:
                         autoScale:
                           description: A boolean value indicating whether auto-scaling
@@ -310,6 +312,8 @@ spec:
                     description: An array of objects specifying the details of the
                       worker nodes available to the Kubernetes cluster.
                     items:
+                      description: KubernetesNodePoolObservation represents the observed
+                        state of KubernetesNodePool
                       properties:
                         autoScale:
                           description: A boolean value indicating whether auto-scaling
@@ -346,6 +350,8 @@ spec:
                           description: An object specifying the details of a specific
                             worker node in a node pool.
                           items:
+                            description: KubernetesNode represents a Node inside of
+                              a KubernetesNodePool
                             properties:
                               createdAt:
                                 description: A time value given in ISO8601 combined
