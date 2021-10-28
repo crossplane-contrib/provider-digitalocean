@@ -30,8 +30,8 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: A KubernetesCluster is a managed resource that represents a DigitalOcean
-          Kubernetes Cluster.
+        description: A DOKubernetesCluster is a managed resource that represents a
+          DigitalOcean Kubernetes Cluster.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -46,7 +46,8 @@ spec:
           metadata:
             type: object
           spec:
-            description: A KubernetesClusterSpec defines the desired state of a KubernetesCluster.
+            description: A DOKubernetesClusterSpec defines the desired state of a
+              KubernetesCluster.
             properties:
               deletionPolicy:
                 default: Delete
@@ -58,7 +59,7 @@ spec:
                 - Delete
                 type: string
               forProvider:
-                description: KubernetesClusterParameters define the desired state
+                description: DOKubernetesClusterParameters define the desired state
                   of a DigitalOcean Kubernetes Cluster Most fields map directly to
                   a KubernetesCluster. See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
                 properties:
@@ -80,15 +81,20 @@ spec:
                         description: The day of the maintenance window policy. May
                           be one of monday through sunday, or any to indicate an arbitrary
                           week day.
+                        enum:
+                        - monday
+                        - tuesday
+                        - wednesday
+                        - thursday
+                        - friday
+                        - saturday
+                        - sunday
                         type: string
                       startTime:
                         description: The start time in UTC of the maintenance window
                           policy in 24-hour clock format / HH:MM notation (e.g., 15:00).
                         type: string
                     type: object
-                  name:
-                    description: A human-readable name for a Kubernetes cluster.
-                    type: string
                   nodePools:
                     description: An array of objects specifying the details of the
                       worker nodes available to the Kubernetes cluster.
@@ -200,7 +206,6 @@ spec:
                       the Kubernetes cluster is assigned.
                     type: string
                 required:
-                - name
                 - nodePools
                 - region
                 - version
@@ -250,11 +255,11 @@ spec:
             - forProvider
             type: object
           status:
-            description: A KubernetesClusterStatus represents the observed state of
-              a KubernetesCluster.
+            description: A DOKubernetesClusterStatus represents the observed state
+              of a KubernetesCluster.
             properties:
               atProvider:
-                description: A KubernetesClusterObservation reflects the observed
+                description: DOKubernetesClusterObservation reflects the observed
                   state of a KubernetesCluster on DigitalOcean. See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
                 properties:
                   autoUpgrade:
@@ -295,6 +300,14 @@ spec:
                         description: The day of the maintenance window policy. May
                           be one of monday through sunday, or any to indicate an arbitrary
                           week day.
+                        enum:
+                        - monday
+                        - tuesday
+                        - wednesday
+                        - thursday
+                        - friday
+                        - saturday
+                        - sunday
                         type: string
                       duration:
                         description: The duration of the maintenance window policy
@@ -433,10 +446,6 @@ spec:
                                 type: string
                             type: object
                           type: array
-                      required:
-                      - count
-                      - name
-                      - size
                       type: object
                     type: array
                   region:
@@ -492,11 +501,6 @@ spec:
                     description: A string specifying the UUID of the VPC to which
                       the Kubernetes cluster is assigned.
                     type: string
-                required:
-                - name
-                - nodePools
-                - region
-                - version
                 type: object
               conditions:
                 description: Conditions of the resource.

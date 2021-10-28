@@ -37,9 +37,6 @@ const (
 // Most fields map directly to a KubernetesCluster.
 // See docs https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
 type DOKubernetesClusterParameters struct {
-	// A human-readable name for a Kubernetes cluster.
-	Name string `json:"name"`
-
 	// The slug identifier for the region where the Kubernetes cluster is located.
 	Region string `json:"region"`
 
@@ -51,7 +48,7 @@ type DOKubernetesClusterParameters struct {
 
 	// A string specifying the UUID of the VPC to which the Kubernetes cluster is assigned.
 	// +kubebuilder:validation:Optional
-	VPCUUID string `json:"vpcuui,omitempty"`
+	VPCUUID *string `json:"vpcuui,omitempty"`
 
 	// An array of tags applied to the Kubernetes cluster. All clusters are automatically tagged k8s and k8s:$K8S_CLUSTER_ID.
 	// +kubebuilder:validation:Optional
@@ -62,19 +59,19 @@ type DOKubernetesClusterParameters struct {
 
 	// An object specifying the maintenance window policy for the Kubernetes cluster.
 	// +kubebuilder:validation:Optional
-	MaintenancePolicy KubernetesClusterMaintenancePolicy `json:"maintenancePolicy,omitempty"`
+	MaintenancePolicy *KubernetesClusterMaintenancePolicy `json:"maintenancePolicy,omitempty"`
 
 	// A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
 	// +kubebuilder:validation:Optional
-	AutoUpgrade bool `json:"autoUpgrade,omitempty"`
+	AutoUpgrade *bool `json:"autoUpgrade,omitempty"`
 
 	// A boolean value indicating whether surge upgrade is enabled/disabled for the cluster. Surge upgrade makes cluster upgrades fast and reliable by bringing up new nodes before destroying the outdated nodes.
 	// +kubebuilder:validation:Optional
-	SurgeUpgrade bool `json:"surgeUpgrade,omitempty"`
+	SurgeUpgrade *bool `json:"surgeUpgrade,omitempty"`
 
 	// A boolean value indicating whether the control plane is run in a highly available configuration in the cluster. Highly available control planes incur less downtime.
 	// +kubebuilder:validation:Optional
-	HighlyAvailable bool `json:"highlyAvailable,omitempty"`
+	HighlyAvailable *bool `json:"highlyAvailable,omitempty"`
 }
 
 // DOKubernetesClusterObservation reflects the observed state of a KubernetesCluster on DigitalOcean.
@@ -84,16 +81,16 @@ type DOKubernetesClusterObservation struct {
 	ID string `json:"id,omitempty"`
 
 	// A human-readable name for a Kubernetes cluster.
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 
 	// The slug identifier for the region where the Kubernetes cluster is located.
-	Region string `json:"region"`
+	Region string `json:"region,omitempty"`
 
 	// The slug identifier for the version of Kubernetes used for the cluster.
 	// If set to a minor version (e.g. "1.14"), the latest version within it will be used (e.g. "1.14.6-do.1");
 	// if set to "latest", the latest published version will be used. See the /v2/kubernetes/options endpoint
 	// to find all currently available versions.
-	Version string `json:"version"`
+	Version string `json:"version,omitempty"`
 
 	// The range of IP addresses in the overlay network of the Kubernetes cluster in CIDR notation.
 	ClusterSubnet string `json:"clusterSubnet,omitempty"`
@@ -114,7 +111,7 @@ type DOKubernetesClusterObservation struct {
 	Tags []string `json:"tags,omitempty"`
 
 	// An array of objects specifying the details of the worker nodes available to the Kubernetes cluster.
-	NodePools []KubernetesNodePoolObservation `json:"nodePools"`
+	NodePools []KubernetesNodePoolObservation `json:"nodePools,omitempty"`
 
 	// An object specifying the maintenance window policy for the Kubernetes cluster.
 	MaintenancePolicy KubernetesClusterMaintenancePolicyObservation `json:"maintenancePolicy,omitempty"`
@@ -179,10 +176,42 @@ type KubernetesNodePool struct {
 
 // KubernetesNodePoolObservation represents the observed state of KubernetesNodePool
 type KubernetesNodePoolObservation struct {
+
 	// A unique ID that can be used to identify and reference a specific node pool.
 	ID string `json:"id,omitempty"`
 
-	NodePool KubernetesNodePool `json:",inline"`
+	// The slug identifier for the type of Droplet used as workers in the node pool.
+	Size string `json:"size,omitempty"`
+
+	// A human-readable name for the node pool.
+	Name string `json:"name,omitempty"`
+
+	// The number of Droplet instances in the node pool.
+	Count int `json:"count,omitempty"`
+
+	// An array containing the tags applied to the node pool. All node pools are automatically tagged k8s, k8s-worker, and k8s:$K8S_CLUSTER_ID.
+	// +kubebuilder:validation:Optional
+	Tags []string `json:"tags,omitempty"`
+
+	// An object containing a set of Kubernetes labels. The keys and are values are both user-defined.
+	// +kubebuilder:validation:Optional
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// An array of taints to apply to all nodes in a pool.
+	// +kubebuilder:validation:Optional
+	Taints []KubernetesNodePoolTaint `json:"taints,omitempty"`
+
+	// A boolean value indicating whether auto-scaling is enabled for this node pool.
+	// +kubebuilder:validation:Optional
+	AutoScale bool `json:"autoScale,omitempty"`
+
+	// The minimum number of nodes that this node pool can be auto-scaled to. The value will be 0 if auto_scale is set to false.
+	// +kubebuilder:validation:Optional
+	MinNodes int `json:"minNodes,omitempty"`
+
+	// The maximum number of nodes that this node pool can be auto-scaled to. The value will be 0 if auto_scale is set to false.
+	// +kubebuilder:validation:Optional
+	MaxNodes int `json:"maxNodes,omitempty"`
 
 	// An object specifying the details of a specific worker node in a node pool.
 	Nodes []KubernetesNode `json:"nodes,omitempty"`
@@ -243,6 +272,7 @@ type KubernetesClusterMaintenancePolicy struct {
 
 	// The day of the maintenance window policy. May be one of monday through sunday, or any to indicate an arbitrary week day.
 	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Enum=monday;tuesday;wednesday;thursday;friday;saturday;sunday
 	Day string `json:"day,omitempty"`
 }
 
