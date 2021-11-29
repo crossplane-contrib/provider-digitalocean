@@ -2,6 +2,8 @@ apiVersion: compute.do.crossplane.io/v1alpha1
 kind: Droplet
 metadata:
   name: example
+  annotations:
+    crossplane.io/external-name: crossplane-droplet
 spec:
   forProvider:
     region: sfo1
