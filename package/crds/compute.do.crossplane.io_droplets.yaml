@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.0
+    controller-gen.kubebuilder.io/version: v0.7.0
   creationTimestamp: null
   name: droplets.compute.do.crossplane.io
 spec:
@@ -30,13 +30,18 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: A Droplet is a managed resource that represents a DigitalOcean Droplet.
+        description: A Droplet is a managed resource that represents a DigitalOcean
+          Droplet.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -44,52 +49,77 @@ spec:
             description: A DropletSpec defines the desired state of a Droplet.
             properties:
               deletionPolicy:
-                description: DeletionPolicy specifies what will happen to the underlying external when this managed resource is deleted - either "Delete" or "Orphan" the external resource. The "Delete" policy is the default when no policy is specified.
+                default: Delete
+                description: DeletionPolicy specifies what will happen to the underlying
+                  external when this managed resource is deleted - either "Delete"
+                  or "Orphan" the external resource.
                 enum:
                 - Orphan
                 - Delete
                 type: string
               forProvider:
-                description: 'DropletParameters define the desired state of a DigitalOcean Droplet. Most fields map directly to a Droplet: https://developers.digitalocean.com/documentation/v2/#droplets'
+                description: 'DropletParameters define the desired state of a DigitalOcean
+                  Droplet. Most fields map directly to a Droplet: https://developers.digitalocean.com/documentation/v2/#droplets'
                 properties:
                   backups:
-                    description: 'Backups: A boolean indicating whether automated backups should be enabled for the Droplet. Automated backups can only be enabled when the Droplet is created.'
+                    description: 'Backups: A boolean indicating whether automated
+                      backups should be enabled for the Droplet. Automated backups
+                      can only be enabled when the Droplet is created.'
                     type: boolean
                   image:
-                    description: 'Image: The image ID of a public or private image, or the unique slug identifier for a public image. This image will be the base image for your Droplet.'
+                    description: 'Image: The image ID of a public or private image,
+                      or the unique slug identifier for a public image. This image
+                      will be the base image for your Droplet.'
                     type: string
                   ipv6:
-                    description: 'IPv6: A boolean indicating whether IPv6 is enabled on the Droplet.'
+                    description: 'IPv6: A boolean indicating whether IPv6 is enabled
+                      on the Droplet.'
                     type: boolean
                   monitoring:
-                    description: 'Monitoring: A boolean indicating whether to install the DigitalOcean agent for monitoring.'
+                    description: 'Monitoring: A boolean indicating whether to install
+                      the DigitalOcean agent for monitoring.'
                     type: boolean
                   private_networking:
-                    description: 'PrivateNetworking: This parameter has been deprecated. Use ''vpc_uuid'' instead to specify a VPC network for the Droplet. If no `vpc_uuid` is provided, the Droplet will be placed in the default VPC.'
+                    description: 'PrivateNetworking: This parameter has been deprecated.
+                      Use ''vpc_uuid'' instead to specify a VPC network for the Droplet.
+                      If no `vpc_uuid` is provided, the Droplet will be placed in
+                      the default VPC.'
                     type: boolean
                   region:
-                    description: 'Region: The unique slug identifier for the region that you wish to deploy in.'
+                    description: 'Region: The unique slug identifier for the region
+                      that you wish to deploy in.'
                     type: string
                   size:
-                    description: 'Size: The unique slug identifier for the size that you wish to select for this Droplet.'
+                    description: 'Size: The unique slug identifier for the size that
+                      you wish to select for this Droplet.'
                     type: string
                   ssh_keys:
-                    description: 'SSHKeys: An array containing the IDs or fingerprints of the SSH keys that you wish to embed in the Droplet''s root account upon creation.'
+                    description: 'SSHKeys: An array containing the IDs or fingerprints
+                      of the SSH keys that you wish to embed in the Droplet''s root
+                      account upon creation.'
                     items:
                       type: string
                     type: array
                   tags:
-                    description: 'Tags: A flat array of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.'
+                    description: 'Tags: A flat array of tag names as strings to apply
+                      to the Droplet after it is created. Tag names can either be
+                      existing or new tags.'
                     items:
                       type: string
                     type: array
                   volumes:
-                    description: 'Volumes: A flat array including the unique string identifier for each block storage volume to be attached to the Droplet. At the moment a volume can only be attached to a single Droplet.'
+                    description: 'Volumes: A flat array including the unique string
+                      identifier for each block storage volume to be attached to the
+                      Droplet. At the moment a volume can only be attached to a single
+                      Droplet.'
                     items:
                       type: string
                     type: array
                   vpc_uuid:
-                    description: 'VPCUUID: A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, beginning on April 7th, 2020, the Droplet will be assigned to your account''s default VPC for the region.'
+                    description: 'VPCUUID: A string specifying the UUID of the VPC
+                      to which the Droplet will be assigned. If excluded, beginning
+                      on April 7th, 2020, the Droplet will be assigned to your account''s
+                      default VPC for the region.'
                     type: string
                 required:
                 - image
@@ -97,7 +127,11 @@ spec:
                 - size
                 type: object
               providerConfigRef:
-                description: ProviderConfigReference specifies how the provider that will be used to create, observe, update, and delete this managed resource should be configured.
+                default:
+                  name: default
+                description: ProviderConfigReference specifies how the provider that
+                  will be used to create, observe, update, and delete this managed
+                  resource should be configured.
                 properties:
                   name:
                     description: Name of the referenced object.
@@ -106,7 +140,9 @@ spec:
                 - name
                 type: object
               providerRef:
-                description: 'ProviderReference specifies the provider that will be used to create, observe, update, and delete this managed resource. Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                description: 'ProviderReference specifies the provider that will be
+                  used to create, observe, update, and delete this managed resource.
+                  Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
                 properties:
                   name:
                     description: Name of the referenced object.
@@ -115,7 +151,11 @@ spec:
                 - name
                 type: object
               writeConnectionSecretToRef:
-                description: WriteConnectionSecretToReference specifies the namespace and name of a Secret to which any connection details for this managed resource should be written. Connection details frequently include the endpoint, username, and password required to connect to the managed resource.
+                description: WriteConnectionSecretToReference specifies the namespace
+                  and name of a Secret to which any connection details for this managed
+                  resource should be written. Connection details frequently include
+                  the endpoint, username, and password required to connect to the
+                  managed resource.
                 properties:
                   name:
                     description: Name of the secret.
@@ -134,16 +174,20 @@ spec:
             description: A DropletStatus represents the observed state of a Droplet.
             properties:
               atProvider:
-                description: A DropletObservation reflects the observed state of a Droplet on DigitalOcean.
+                description: A DropletObservation reflects the observed state of a
+                  Droplet on DigitalOcean.
                 properties:
                   creationTimestamp:
                     description: CreationTimestamp in RFC3339 text format.
                     type: string
                   id:
-                    description: ID for the resource. This identifier is defined by the server.
+                    description: ID for the resource. This identifier is defined by
+                      the server.
                     type: integer
                   status:
-                    description: "A Status string indicating the state of the Droplet instance. \n Possible values:   \"new\"   \"active\"   \"off\"   \"archive\""
+                    description: "A Status string indicating the state of the Droplet
+                      instance. \n Possible values:   \"new\"   \"active\"   \"off\"
+                      \  \"archive\""
                     type: string
                 type: object
               conditions:
@@ -152,20 +196,25 @@ spec:
                   description: A Condition that may apply to a resource.
                   properties:
                     lastTransitionTime:
-                      description: LastTransitionTime is the last time this condition transitioned from one status to another.
+                      description: LastTransitionTime is the last time this condition
+                        transitioned from one status to another.
                       format: date-time
                       type: string
                     message:
-                      description: A Message containing details about this condition's last transition from one status to another, if any.
+                      description: A Message containing details about this condition's
+                        last transition from one status to another, if any.
                       type: string
                     reason:
-                      description: A Reason for this condition's last transition from one status to another.
+                      description: A Reason for this condition's last transition from
+                        one status to another.
                       type: string
                     status:
-                      description: Status of this condition; is it currently True, False, or Unknown?
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
                       type: string
                     type:
-                      description: Type of this condition. At most one of each condition type may apply to a resource at any point in time.
+                      description: Type of this condition. At most one of each condition
+                        type may apply to a resource at any point in time.
                       type: string
                   required:
                   - lastTransitionTime
