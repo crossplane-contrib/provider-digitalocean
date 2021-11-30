@@ -98,7 +98,7 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 
 	externalID, err := strconv.Atoi(meta.GetExternalName(cr))
 	if err != nil {
-		// on the first try the value of 'crossplane.io/external-name' annotaion
+		// on the first try the value of 'crossplane.io/external-name' annotation
 		// is name of the 'Droplet' resource (i.e. type string,) which will get
 		// updated to id (i.e. type int) of managed resource when it gets created.
 		externalID = 0
@@ -145,15 +145,22 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 
 	cr.Status.SetConditions(xpv1.Creating())
 
+	name := meta.GetExternalName(cr)
+	if meta.GetExternalName(cr) == "" {
+		name = cr.GetName()
+	}
+
 	create := &godo.DropletCreateRequest{}
-	docompute.GenerateDroplet(meta.GetExternalName(cr), cr.Spec.ForProvider, create)
+	docompute.GenerateDroplet(name, cr.Spec.ForProvider, create)
 
 	droplet, _, err := c.Droplets.Create(ctx, create)
 	if err != nil || droplet == nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errDropletCreateFailed)
 	}
 
-	meta.SetExternalName(cr, strconv.Itoa(droplet.ID))
+	if meta.GetExternalName(cr) == "" {
+		meta.SetExternalName(cr, strconv.Itoa(droplet.ID))
+	}
 
 	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
 }
