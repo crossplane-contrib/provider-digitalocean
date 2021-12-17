@@ -23,6 +23,7 @@ import (
 
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/compute"
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/config"
+	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/kubernetes"
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/loadbalancer"
 )
 
@@ -32,6 +33,7 @@ func Setup(mgr ctrl.Manager, l logging.Logger) error {
 	for _, setup := range []func(ctrl.Manager, logging.Logger) error{
 		config.Setup,
 		compute.SetupDroplet,
+		kubernetes.SetupKubernetesCluster,
 		loadbalancer.SetupLB,
 	} {
 		if err := setup(mgr, l); err != nil {

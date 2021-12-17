@@ -1,0 +1,22 @@
+apiVersion: kubernetes.do.crossplane.io/v1alpha1
+kind: DOKubernetesCluster
+metadata:
+  name: example-cluster
+spec:
+  providerConfigRef:
+    name: example
+  forProvider:
+    region: nyc1
+    version: 1.21.5-do.0
+    tags:
+      - example-tag
+    nodePools:
+      - size: s-1vcpu-2gb
+        count: 3
+        name: worker-pool
+    maintenancePolicy:
+      startTime: "00:00"
+      day: wednesday
+    autoUpgrade: true
+    surgeUpgrade: false
+    highlyAvailable: false

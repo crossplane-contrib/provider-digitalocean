@@ -116,7 +116,9 @@ run: go.build
 	@# To see other arguments that can be provided, run the command with --help instead
 	$(GO_OUT_DIR)/provider --debug
 
-dev: $(KIND) $(KUBECTL)
+dev: dev-kind dev-provider
+
+dev-kind: $(KIND) $(KUBECTL)
 	@$(INFO) Creating kind cluster
 	@$(KIND) create cluster --name=provider-digitalocean-dev
 	@$(KUBECTL) cluster-info --context kind-provider-digitalocean-dev
@@ -124,6 +126,13 @@ dev: $(KIND) $(KUBECTL)
 	@$(KUBECTL) apply -k https://github.com/crossplane/crossplane//cluster?ref=master
 	@$(INFO) Installing Provider DigitalOcean CRDs
 	@$(KUBECTL) apply -f $(CRD_DIR) -R
+	@$(INFO) Creating crossplane-system Namespace and installing Crossplane
+	@$(KUBECTL) create namespace crossplane-system
+	@$(HELM3) repo add crossplane-stable https://charts.crossplane.io/stable
+	@$(HELM3) repo update
+	@$(HELM3) install crossplane --namespace crossplane-system crossplane-stable/crossplane
+
+dev-provider:
 	@$(INFO) Starting Provider DigitalOcean controllers
 	@$(GO) run cmd/provider/main.go --debug
 
