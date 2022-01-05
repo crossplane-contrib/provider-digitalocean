@@ -79,6 +79,24 @@ func BoolValue(v *bool) bool {
 	return *v
 }
 
+// Int64Value converts the supplied int64 pointer to an int, returning zero if
+// the pointer is nil.
+func Int64Value(v *int64) int64 {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+
+// IntValue converts the supplied int pointer to an int, returning zero if
+// the pointer is nil.
+func IntValue(v *int) int {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+
 // LateInitialize functions initialize s(first argument), presumed to be an
 // optional field of a Kubernetes API object's spec per Kubernetes
 // "late initialization" semantics. s is returned unchanged if it is non-nil

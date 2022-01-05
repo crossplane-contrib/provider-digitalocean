@@ -1,0 +1,15 @@
+apiVersion: database.do.crossplane.io/v1alpha1
+kind: DODatabaseCluster
+metadata:
+  name: example
+spec:
+  forProvider:
+    engine: pg
+    version: "13"
+    numNodes: 3
+    size: db-s-2vcpu-4gb
+    region: nyc3
+    tags:
+      - "from-crossplane"
+  providerConfigRef:
+    name: example
