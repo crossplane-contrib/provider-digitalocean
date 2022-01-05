@@ -12,4 +12,4 @@ spec:
     tags:
       - "from-crossplane"
   providerConfigRef:
-    name: example-config
+    name: example
