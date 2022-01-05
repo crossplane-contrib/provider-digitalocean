@@ -65,9 +65,12 @@ helm install crossplane --namespace crossplane-system crossplane-stable/crosspla
 ```console
 kubectl apply -f provider-digitalocean/examples/provider/config.yaml
 ```
-1. Check that the Provider has been created by running ```console
+1. Check that the Provider has been created by running 
+
+```console
 kubectl get ProviderConfig
 ```
+
 You should see output similar to this: 
 
 ```console
