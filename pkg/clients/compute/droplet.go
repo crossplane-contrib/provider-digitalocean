@@ -40,6 +40,7 @@ func GenerateDroplet(name string, in v1alpha1.DropletParameters, create *godo.Dr
 	create.Volumes = generateVolumes(in.Volumes)
 	create.Tags = in.Tags
 	create.VPCUUID = do.StringValue(in.VPCUUID)
+	create.WithDropletAgent = in.WithDropletAgent
 }
 
 func generateImage(param string) godo.DropletCreateImage {

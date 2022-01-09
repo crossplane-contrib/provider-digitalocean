@@ -121,6 +121,13 @@ spec:
                       on April 7th, 2020, the Droplet will be assigned to your account''s
                       default VPC for the region.'
                     type: string
+                  with_droplet_agent:
+                    description: 'WithDropletAgent: A boolean indicating whether to
+                      install the DigitalOcean agent used for providing access to
+                      the Droplet web console in the control panel. To prevent it
+                      from being installed, set to false. To make installation errors
+                      fatal, explicitly set it to true.'
+                    type: boolean
                 required:
                 - image
                 - region

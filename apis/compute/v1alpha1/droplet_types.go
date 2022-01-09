@@ -100,6 +100,14 @@ type DropletParameters struct {
 	// +optional
 	// +immutable
 	VPCUUID *string `json:"vpc_uuid,omitempty"`
+
+	// WithDropletAgent: A boolean indicating whether to install the DigitalOcean
+	// agent used for providing access to the Droplet web console in the control panel.
+	// To prevent it from being installed, set to false.
+	// To make installation errors fatal, explicitly set it to true.
+	// +optional
+	// +immutable
+	WithDropletAgent *bool `json:"with_droplet_agent,omitempty"`
 }
 
 // A DropletObservation reflects the observed state of a Droplet on DigitalOcean.
