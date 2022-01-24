@@ -46,9 +46,9 @@ GO111MODULE = on
 # ====================================================================================
 # Setup Images
 
-DOCKER_REGISTRY = crossplane
+REGISTRY_ORGS = docker.io/crossplane
 IMAGES = provider-digitalocean provider-digitalocean-controller
--include build/makelib/image.mk
+-include build/makelib/imagelight.mk
 
 # ====================================================================================
 # Targets
@@ -79,20 +79,6 @@ crds.clean:
 	@$(OK) cleaned generated CRDs
 
 generate: crds.clean
-
-# Ensure a PR is ready for review.
-reviewable: generate lint
-	@go mod tidy
-
-# Ensure branch is clean.
-check-diff: reviewable
-	@$(INFO) checking that branch is clean
-	@if [ ! -z "$$(git status --porcelain)" ]; then \
-		$(WARN) Git status failure see below output; \
-		git status; \
-		$(FAIL); \
-	fi
-	@$(OK) branch is clean
 
 manifests:
 	@$(WARN) Deprecated. Please run make generate instead.
