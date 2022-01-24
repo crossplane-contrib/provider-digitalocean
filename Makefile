@@ -80,20 +80,6 @@ crds.clean:
 
 generate: crds.clean
 
-# Ensure a PR is ready for review.
-reviewable: generate lint
-	@go mod tidy
-
-# Ensure branch is clean.
-check-diff: reviewable
-	@$(INFO) checking that branch is clean
-	@if [ ! -z "$$(git status --porcelain)" ]; then \
-		$(WARN) Git status failure see below output; \
-		git status; \
-		$(FAIL); \
-	fi
-	@$(OK) branch is clean
-
 manifests:
 	@$(WARN) Deprecated. Please run make generate instead.
 
