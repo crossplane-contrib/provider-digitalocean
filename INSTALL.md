@@ -59,20 +59,20 @@ helm install crossplane --namespace crossplane-system crossplane-stable/crosspla
 
 ## Install the DigitalOcean Crossplane Provider
 
-1. Find the provider installation file at [provider-digitalocean/examples/provider/install.yaml](./examples/provider/install.yaml)
+1. Find the provider installation file at [examples/provider/install.yaml](./examples/provider/install.yaml)
 2. Run the installation:
 
 ```console
-kubectl apply -f provider-digitalocean/examples/provider/install.yaml
+kubectl apply -f https://raw.githubusercontent.com/crossplane-contrib/provider-digitalocean/main/examples/provider/install.yaml
 ```
 
 ## Configure the DigitalOcean Crossplane Provider 
-1. Find the provider config file at [provider-digitalocean/examples/provider/config.yaml](./examples/provider/config.yaml)
+1. Find the provider config file at [examples/provider/config.yaml](./examples/provider/config.yaml)
 1. [Create a DigitalOcean personal access token](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
 1. Encode that token using base64, and in the `config.yaml` file, replace `BASE64ENCODED_PROVIDER_CREDS` with your encoded token
 1. Create a new Secret and ProviderConfig with 
 ```console
-kubectl apply -f provider-digitalocean/examples/provider/config.yaml
+kubectl apply -f https://raw.githubusercontent.com/crossplane-contrib/provider-digitalocean/main/examples/provider/config.yaml
 ```
 1. Check that the Provider has been created by running 
 
