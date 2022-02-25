@@ -15,6 +15,7 @@ package database
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/digitalocean/godo"
 	"github.com/google/go-cmp/cmp"
@@ -57,7 +58,6 @@ func SetupDatabase(mgr ctrl.Manager, l logging.Logger) error {
 			resource.ManagedKind(v1alpha1.DBGroupVersionKind),
 			managed.WithExternalConnecter(&dbConnector{kube: mgr.GetClient()}),
 			managed.WithReferenceResolver(managed.NewAPISimpleReferenceResolver(mgr.GetClient())),
-			managed.WithConnectionPublishers(),
 			managed.WithInitializers(managed.NewDefaultProviderConfig(mgr.GetClient())),
 			managed.WithLogger(l.WithValues("controller", name)),
 			managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name)))))
@@ -211,11 +211,23 @@ func (c *dbExternal) Create(ctx context.Context, mg resource.Managed) (managed.E
 
 	meta.SetExternalName(cr, db.ID)
 
-	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
+	ec := managed.ExternalCreation{}
+
+	if cr.Spec.WriteConnectionSecretToReference != nil {
+		ec.ConnectionDetails = managed.ConnectionDetails{
+			xpv1.ResourceCredentialsSecretEndpointKey: []byte(db.Connection.URI),
+			"host":                                    []byte(db.Connection.Host),
+			xpv1.ResourceCredentialsSecretPortKey:     []byte(strconv.Itoa(db.Connection.Port)),
+			xpv1.ResourceCredentialsSecretUserKey:     []byte(db.Connection.User),
+			xpv1.ResourceCredentialsSecretPasswordKey: []byte(db.Connection.Password),
+		}
+	}
+
+	return ec, nil
 }
 
 func (c *dbExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
-	// Droplets cannot be updated.
+	// We don't allow the updating of databases right now.
 	return managed.ExternalUpdate{}, nil
 }
 

@@ -117,7 +117,7 @@ run: go.build
 
 dev: dev-kind dev-provider
 
-dev-kind: $(KIND) $(KUBECTL)
+dev-kind: $(KIND) $(KUBECTL) $(HELM3)
 	@$(INFO) Creating kind cluster
 	@$(KIND) create cluster --name=provider-digitalocean-dev
 	@$(KUBECTL) cluster-info --context kind-provider-digitalocean-dev
