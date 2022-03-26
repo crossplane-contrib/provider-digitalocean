@@ -1,0 +1,259 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
+  creationTimestamp: null
+  name: docontainerregistries.kubernetes.do.crossplane.io
+spec:
+  group: kubernetes.do.crossplane.io
+  names:
+    categories:
+    - crossplane
+    - managed
+    - do
+    kind: DOContainerRegistry
+    listKind: DOContainerRegistryList
+    plural: docontainerregistries
+    singular: docontainerregistry
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=='Ready')].status
+      name: READY
+      type: string
+    - jsonPath: .status.conditions[?(@.type=='Synced')].status
+      name: SYNCED
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: A DOContainerRegistry is a managed resource that represents a
+          DigitalOcean Container Registry.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: A DOContainerRegistrySpec defines the desired state of a
+              ContainerRegistry.
+            properties:
+              deletionPolicy:
+                default: Delete
+                description: DeletionPolicy specifies what will happen to the underlying
+                  external when this managed resource is deleted - either "Delete"
+                  or "Orphan" the external resource.
+                enum:
+                - Orphan
+                - Delete
+                type: string
+              forProvider:
+                description: 'DOContainerRegistryParameters define the desired state
+                  of a DigitalOcean Container Registry. Most fields map directly to
+                  a Containe rRegistry: https://docs.digitalocean.com/reference/api/api-reference/#tag/Container-Registry'
+                properties:
+                  region:
+                    description: Slug of the region where registry data is stored.
+                      When not provided, a region will be selected.
+                    type: string
+                  subscription_tier:
+                    description: The slug of the subscription tier to sign up for.
+                      Valid values can be retrieved using the options endpoint.
+                    type: string
+                required:
+                - subscription_tier
+                type: object
+              providerConfigRef:
+                default:
+                  name: default
+                description: ProviderConfigReference specifies how the provider that
+                  will be used to create, observe, update, and delete this managed
+                  resource should be configured.
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              providerRef:
+                description: 'ProviderReference specifies the provider that will be
+                  used to create, observe, update, and delete this managed resource.
+                  Deprecated: Please use ProviderConfigReference, i.e. `providerConfigRef`'
+                properties:
+                  name:
+                    description: Name of the referenced object.
+                    type: string
+                required:
+                - name
+                type: object
+              writeConnectionSecretToRef:
+                description: WriteConnectionSecretToReference specifies the namespace
+                  and name of a Secret to which any connection details for this managed
+                  resource should be written. Connection details frequently include
+                  the endpoint, username, and password required to connect to the
+                  managed resource.
+                properties:
+                  name:
+                    description: Name of the secret.
+                    type: string
+                  namespace:
+                    description: Namespace of the secret.
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+            required:
+            - forProvider
+            type: object
+          status:
+            description: A DOContainerRegistryStatus represents the observed state
+              of a ContainerRegistry.
+            properties:
+              atProvider:
+                description: A DOContainerRegistryObservation reflects the observed
+                  state of a Container Registry on DigitalOcean.
+                properties:
+                  created_at:
+                    description: A time value given in ISO8601 combined date and time
+                      format that represents when the registry was created.
+                    type: string
+                  name:
+                    description: A globally unique name for the container registry.
+                      Must be lowercase and be composed only of numbers, letters and
+                      -, up to a limit of 63 characters.
+                    type: string
+                  region:
+                    description: Slug of the region where registry data is stored.
+                    type: string
+                  storage_usage_bytes:
+                    description: The amount of storage used in the registry in bytes.
+                    type: integer
+                  storage_usage_bytes_updated_at:
+                    description: The time at which the storage usage was updated.
+                      Storage usage is calculated asynchronously, and may not immediately
+                      reflect pushes to the registry.
+                    type: string
+                  subscription:
+                    description: An object specifying the subscription for a Container
+                      Registry.
+                    properties:
+                      created_at:
+                        description: The time at which the subscription was created.
+                        type: string
+                      tier:
+                        description: An object specifying the subscription tier for
+                          a Container Registry.
+                        properties:
+                          allow_storage_overrage:
+                            description: A boolean indicating whether the subscription
+                              tier supports additional storage above what is included
+                              in the base plan at an additional cost per GiB used.
+                            type: boolean
+                          included_bandwidth_bytes:
+                            description: The amount of outbound data transfer included
+                              in the subscription tier in bytes.
+                            type: integer
+                          included_repositories:
+                            description: The number of repositories included in the
+                              subscription tier. 0 indicates that the subscription
+                              tier includes unlimited repositories.
+                            type: integer
+                          included_storage_bytes:
+                            description: The amount of storage included in the subscription
+                              tier in bytes.
+                            type: integer
+                          monthly_price_in_cents:
+                            description: The monthly cost of the subscription tier
+                              in cents.
+                            type: integer
+                          name:
+                            description: The name of the subscription tier.
+                            type: string
+                          slug:
+                            description: The slug identifier of the subscription tier.
+                            type: string
+                        required:
+                        - allow_storage_overrage
+                        - included_bandwidth_bytes
+                        - included_repositories
+                        - included_storage_bytes
+                        - monthly_price_in_cents
+                        - name
+                        - slug
+                        type: object
+                      updated_at:
+                        description: The time at which the subscription was last updated.
+                        type: string
+                    required:
+                    - created_at
+                    - tier
+                    - updated_at
+                    type: object
+                required:
+                - created_at
+                - name
+                - region
+                - storage_usage_bytes
+                - storage_usage_bytes_updated_at
+                - subscription
+                type: object
+              conditions:
+                description: Conditions of the resource.
+                items:
+                  description: A Condition that may apply to a resource.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time this condition
+                        transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A Message containing details about this condition's
+                        last transition from one status to another, if any.
+                      type: string
+                    reason:
+                      description: A Reason for this condition's last transition from
+                        one status to another.
+                      type: string
+                    status:
+                      description: Status of this condition; is it currently True,
+                        False, or Unknown?
+                      type: string
+                    type:
+                      description: Type of this condition. At most one of each condition
+                        type may apply to a resource at any point in time.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
