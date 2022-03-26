@@ -14,8 +14,6 @@ limitations under the License.
 package kubernetes
 
 import (
-	"net/http"
-
 	"github.com/digitalocean/godo"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
@@ -91,17 +89,4 @@ func LateInitializeSpec(p *v1alpha1.DOKubernetesClusterParameters, observed godo
 	p.AutoUpgrade = do.LateInitializeBool(p.AutoUpgrade, observed.AutoUpgrade)
 	p.SurgeUpgrade = do.LateInitializeBool(p.SurgeUpgrade, observed.SurgeUpgrade)
 	p.HighlyAvailable = do.LateInitializeBool(p.HighlyAvailable, observed.HA)
-}
-
-// IgnoreNotFound checks for response of DigitalOcean GET API call
-// and the content of returned error to ignore it if the response
-// is a '404 not found' error otherwise bubble up the error.
-func IgnoreNotFound(err error, response *godo.Response) error {
-	if err != nil && err.Error() == "databaseID is invalid because cannot be less than 1" {
-		return nil
-	}
-	if response != nil && response.StatusCode == http.StatusNotFound {
-		return nil
-	}
-	return err
 }

@@ -14,8 +14,6 @@ limitations under the License.
 package database
 
 import (
-	"net/http"
-
 	"github.com/digitalocean/godo"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/database/v1alpha1"
@@ -47,17 +45,4 @@ func LateInitializeSpec(p *v1alpha1.DODatabaseClusterParameters, observed godo.D
 			p.Tags[i] = tag
 		}
 	}
-}
-
-// IgnoreNotFound checks for response of DigitalOcean GET API call
-// and the content of returned error to ignore it if the response
-// is a '404 not found' error otherwise bubble up the error.
-func IgnoreNotFound(err error, response *godo.Response) error {
-	if err != nil && err.Error() == "databaseID is invalid because cannot be less than 1" {
-		return nil
-	}
-	if response != nil && response.StatusCode == http.StatusNotFound {
-		return nil
-	}
-	return err
 }

@@ -97,7 +97,7 @@ func (c *lbExternal) Observe(ctx context.Context, mg resource.Managed) (managed.
 
 	observed, response, err := c.LoadBalancers.Get(ctx, meta.GetExternalName(cr))
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(dolb.IgnoreNotFound(err, response), errGetLB)
+		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetLB)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
@@ -169,5 +169,5 @@ func (c *lbExternal) Delete(ctx context.Context, mg resource.Managed) error {
 	cr.Status.SetConditions(xpv1.Deleting())
 
 	response, err := c.LoadBalancers.Delete(ctx, cr.Status.AtProvider.ID)
-	return errors.Wrap(dolb.IgnoreNotFound(err, response), errLBDeleteFailed)
+	return errors.Wrap(do.IgnoreNotFound(err, response), errLBDeleteFailed)
 }

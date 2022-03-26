@@ -18,6 +18,9 @@ package clients
 
 import (
 	"context"
+	"github.com/digitalocean/godo"
+	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
@@ -147,4 +150,17 @@ func LateInitializeStringMap(s map[string]string, from map[string]string) map[st
 		return s
 	}
 	return from
+}
+
+// IgnoreNotFound checks for response of DigitalOcean GET API call
+// and the content of returned error to ignore it if the response
+// is a '404 not found' error otherwise bubble up the error.
+func IgnoreNotFound(err error, response *godo.Response) error {
+	if err != nil && strings.Contains(err.Error(), "is invalid because cannot be less than 1") {
+		return nil
+	}
+	if response != nil && response.StatusCode == http.StatusNotFound {
+		return nil
+	}
+	return err
 }

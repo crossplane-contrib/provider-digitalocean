@@ -95,7 +95,7 @@ func (c *dbExternal) Observe(ctx context.Context, mg resource.Managed) (managed.
 
 	observed, response, err := c.Databases.Get(ctx, meta.GetExternalName(cr))
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(dodb.IgnoreNotFound(err, response), errGetDB)
+		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetDB)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
@@ -240,5 +240,5 @@ func (c *dbExternal) Delete(ctx context.Context, mg resource.Managed) error {
 	cr.Status.SetConditions(xpv1.Deleting())
 
 	response, err := c.Databases.Delete(ctx, *cr.Status.AtProvider.ID)
-	return errors.Wrap(dodb.IgnoreNotFound(err, response), errDBDeleteFailed)
+	return errors.Wrap(do.IgnoreNotFound(err, response), errDBDeleteFailed)
 }
