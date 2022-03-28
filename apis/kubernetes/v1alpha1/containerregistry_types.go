@@ -34,7 +34,7 @@ type DOContainerRegistryParameters struct {
 	// When not provided, a region will be selected.
 	// +immutable
 	// +kubebuilder:validation:Optional
-	Region string `json:"region,omitempty"`
+	Region *string `json:"region,omitempty"`
 }
 
 // The Tier defines a subscription tier for a Container Registry.
@@ -47,20 +47,20 @@ type Tier struct {
 
 	// The number of repositories included in the subscription tier.
 	// 0 indicates that the subscription tier includes unlimited repositories.
-	IncludedRepositories int `json:"included_repositories"`
+	IncludedRepositories uint64 `json:"included_repositories"`
 
 	// The amount of storage included in the subscription tier in bytes.
-	IncludedStorageBytes int `json:"included_storage_bytes"`
+	IncludedStorageBytes uint64 `json:"included_storage_bytes"`
 
 	// A boolean indicating whether the subscription tier supports
 	// additional storage above what is included in the base plan at an additional cost per GiB used.
 	AllowStorageOverage bool `json:"allow_storage_overrage"`
 
 	// The amount of outbound data transfer included in the subscription tier in bytes.
-	IncludedBandwidthBytes int `json:"included_bandwidth_bytes"`
+	IncludedBandwidthBytes uint64 `json:"included_bandwidth_bytes"`
 
 	// The monthly cost of the subscription tier in cents.
-	MonthlyPriceInCents int `json:"monthly_price_in_cents"`
+	MonthlyPriceInCents uint64 `json:"monthly_price_in_cents"`
 }
 
 // The Subscription defines a subscription for a Container Registry.
@@ -88,7 +88,7 @@ type DOContainerRegistryObservation struct {
 	Region string `json:"region"`
 
 	// The amount of storage used in the registry in bytes.
-	StorageUsageBytes int `json:"storage_usage_bytes"`
+	StorageUsageBytes uint64 `json:"storage_usage_bytes"`
 
 	// The time at which the storage usage was updated.
 	// Storage usage is calculated asynchronously, and may not immediately reflect pushes to the registry.

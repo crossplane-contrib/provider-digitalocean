@@ -35,6 +35,7 @@ func Setup(mgr ctrl.Manager, l logging.Logger) error {
 		compute.SetupDroplet,
 		database.SetupDatabase,
 		kubernetes.SetupKubernetesCluster,
+		kubernetes.SetupDOContainerRegistry,
 		loadbalancer.SetupLB,
 	} {
 		if err := setup(mgr, l); err != nil {
