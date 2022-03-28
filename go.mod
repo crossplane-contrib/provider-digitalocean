@@ -6,7 +6,7 @@ require (
 	github.com/alecthomas/units v0.0.0-20210927113745-59d0afb8317a // indirect
 	github.com/crossplane/crossplane-runtime v0.15.1
 	github.com/crossplane/crossplane-tools v0.0.0-20210916125540-071de511ae8e
-	github.com/digitalocean/godo v1.69.1
+	github.com/digitalocean/godo v1.77.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1
