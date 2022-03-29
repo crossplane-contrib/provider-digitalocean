@@ -24,6 +24,7 @@ import (
 	dbv1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/database/v1alpha1"
 	kubev1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
 	lbv1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/loadbalancer/v1alpha1"
+	storv1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/storage/v1alpha1"
 	dov1alpha1 "github.com/crossplane-contrib/provider-digitalocean/apis/v1alpha1"
 )
 
@@ -35,6 +36,7 @@ func init() {
 		dbv1alpha1.SchemeBuilder.AddToScheme,
 		kubev1alpha1.SchemeBuilder.AddToScheme,
 		lbv1alpha1.SchemeBuilder.AddToScheme,
+		storv1alpha1.SchemeBuilder.AddToScheme,
 	)
 }
 

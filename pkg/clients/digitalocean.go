@@ -38,19 +38,9 @@ import (
 // to use when the controller connects to DigitalOcean API in order to reconcile
 // the managed resource.
 func GetAuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (token string, err error) {
-	pc := &v1alpha1.ProviderConfig{}
-	t := resource.NewProviderConfigUsageTracker(c, &v1alpha1.ProviderConfigUsage{})
-	if err := t.Track(ctx, mg); err != nil {
+	pc, err := getProviderConfig(ctx, c, mg)
+	if err != nil {
 		return "", err
-	}
-	if err := c.Get(ctx, types.NamespacedName{Name: mg.GetProviderConfigReference().Name}, pc); err != nil {
-		return "", err
-	}
-
-	// NOTE(muvaf): When we implement the workload identity, we will only need to
-	// return a different type of option.ClientOption, which is WithTokenSource().
-	if s := pc.Spec.Credentials.Source; s != xpv1.CredentialsSourceSecret {
-		return "", errors.Errorf("unsupported credentials source %q", s)
 	}
 
 	ref := pc.Spec.Credentials.SecretRef
@@ -63,6 +53,61 @@ func GetAuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (tok
 		return "", err
 	}
 	return string(s.Data[ref.Key]), nil
+}
+
+// GetS3AuthInfo returns the access key and private access key needed to access DigitalOcean's S3 api
+func GetS3AuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (accessKey, privateAccessKey string, err error) {
+	pc, err := getProviderConfig(ctx, c, mg)
+	if err != nil {
+		return "", "", err
+	}
+
+	spacesCredentials := pc.Spec.SpacesCredentials
+	if spacesCredentials == nil {
+		return "", "", errors.New("no spaces credentials was provided")
+	}
+
+	accessKeyRef := pc.Spec.SpacesCredentials.AccessKeyRef.SecretRef
+	if accessKeyRef == nil {
+		return "", "", errors.New("no spaces access key was provided")
+	}
+
+	secretKeyRef := pc.Spec.SpacesCredentials.SecretAccessKeyRef.SecretRef
+	if secretKeyRef == nil {
+		return "", "", errors.New("no spaces secret access key was provided")
+	}
+
+	accessKeyS := &v1.Secret{}
+	secretKeyS := &v1.Secret{}
+
+	if err := c.Get(ctx, types.NamespacedName{Name: accessKeyRef.Name, Namespace: accessKeyRef.Namespace}, accessKeyS); err != nil {
+		return "", "", err
+	}
+
+	if err := c.Get(ctx, types.NamespacedName{Name: secretKeyS.Name, Namespace: secretKeyS.Namespace}, secretKeyS); err != nil {
+		return "", "", err
+	}
+
+	return string(accessKeyS.Data[accessKeyRef.Key]), string(secretKeyS.Data[secretKeyRef.Key]), nil
+}
+
+func getProviderConfig(ctx context.Context, c client.Client, mg resource.Managed) (*v1alpha1.ProviderConfig, error) {
+	pc := &v1alpha1.ProviderConfig{}
+	t := resource.NewProviderConfigUsageTracker(c, &v1alpha1.ProviderConfigUsage{})
+	if err := t.Track(ctx, mg); err != nil {
+		return nil, err
+	}
+	if err := c.Get(ctx, types.NamespacedName{Name: mg.GetProviderConfigReference().Name}, pc); err != nil {
+		return nil, err
+	}
+
+	// NOTE(muvaf): When we implement the workload identity, we will only need to
+	// return a different type of option.ClientOption, which is WithTokenSource().
+	if s := pc.Spec.Credentials.Source; s != xpv1.CredentialsSourceSecret {
+		return nil, errors.Errorf("unsupported credentials source %q", s)
+	}
+
+	return pc, nil
 }
 
 // StringValue converts the supplied string pointer to a string, returning the

@@ -29,6 +29,9 @@ type ProviderConfigSpec struct {
 
 	// Add any other fields here for information that is specific to configuring
 	// a provider, such as authentication details.
+
+	// +kubebuilder:validation:Optional
+	SpacesCredentials *ProviderS3Credentials `json:"spacesCredentials,omitempty"`
 }
 
 // ProviderCredentials required to authenticate.
@@ -38,6 +41,19 @@ type ProviderCredentials struct {
 	Source xpv1.CredentialsSource `json:"source"`
 
 	xpv1.CommonCredentialSelectors `json:",inline"`
+}
+
+// ProviderS3Credentials required to interact with DigitalOcean spaces
+type ProviderS3Credentials struct {
+	// Source of the provider credentials.
+	// +kubebuilder:validation:Enum=None;Secret;InjectedIdentity;Environment;Filesystem
+	Source xpv1.CredentialsSource `json:"source"`
+
+	// AccessKeyRef is a reference to a secret that contains the access key to be used with DigitalOcean Spaces
+	AccessKeyRef xpv1.CommonCredentialSelectors `json:"accessKey"`
+
+	// SecretAccessKeyRef is a reference to a secret that contains the secret access key to be used with DigitalOcean Spaces
+	SecretAccessKeyRef xpv1.CommonCredentialSelectors `json:"secretAccessKey"`
 }
 
 // A ProviderConfigStatus reflects the observed state of a ProviderConfig.
