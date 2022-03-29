@@ -25,6 +25,7 @@ import (
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/database"
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/kubernetes"
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/loadbalancer"
+	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/storage"
 )
 
 // Setup creates all DigitalOcean controllers with the supplied logger and adds them to
@@ -37,6 +38,7 @@ func Setup(mgr ctrl.Manager, l logging.Logger) error {
 		kubernetes.SetupKubernetesCluster,
 		kubernetes.SetupDOContainerRegistry,
 		loadbalancer.SetupLB,
+		storage.SetupSpaces,
 	} {
 		if err := setup(mgr, l); err != nil {
 			return err

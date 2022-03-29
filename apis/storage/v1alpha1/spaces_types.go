@@ -14,17 +14,10 @@ limitations under the License.
 package v1alpha1
 
 import (
+	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
-)
-
-type ObjectOwnershipType string
-
-const (
-	BucketOwnerPreferred ObjectOwnershipType = "BucketOwnerPreferred"
-	ObjectWriter         ObjectOwnershipType = "ObjectWriter"
-	BucketOwnerEnforced  ObjectOwnershipType = "BucketOwnerEnforced"
 )
 
 // DOSpaceParameters define the desired state of a DigitalOcean Space
@@ -34,8 +27,9 @@ type DOSpaceParameters struct {
 	// The canned ACL to apply to the bucket.
 	ACL *string `json:"acl,omitempty"`
 
-	// The name of the bucket to create. This is required.
-	BucketName string `json:"bucketName"`
+	// Region: The unique slug identifier for the region that you wish to create the bucket in.
+	// +immutable
+	Region string `json:"region"`
 
 	// Allows grantee the read, write, read ACP, and write ACP permissions on the bucket.
 	// +kubebuilder:validation:Optional
@@ -58,9 +52,6 @@ type DOSpaceParameters struct {
 	// +kubebuilder:validation:Optional
 	GrantWriteACP *string `json:"grantWriteACP,omitempty"`
 
-	// Specifies whether you want S3 Object Lock to be enabled for the new bucket.
-	ObjectLockEnabledForBucket *bool `json:"objectLockEnabledForBucket,omitempty"`
-
 	// The container element for object ownership for a bucket's ownership controls.
 	//
 	// BucketOwnerPreferred - Objects uploaded to the bucket change ownership to
@@ -75,21 +66,38 @@ type DOSpaceParameters struct {
 	// over every object in the bucket. The bucket only accepts PUT requests that
 	// don't specify an ACL or bucket owner full control ACLs, such as the bucket-owner-full-control
 	// canned ACL or an equivalent form of this ACL expressed in the XML format.
-	ObjectOwnership *ObjectOwnershipType `json:"objectOwnership,omitempty"`
+	ObjectOwnership *s3types.ObjectOwnership `json:"objectOwnership,omitempty"`
 }
 
-type DOSpaceObservation struct{}
+// A DOSpaceObservation reflects the observed state of a DigitalOcean S3 bucket.
+type DOSpaceObservation struct {
+	// Name is the name of the observed Spaces bucket
+	// +kubebuilder:validation:Optional
+	Name string `json:"name,omitempty"`
 
+	// CreationDate is when the Spaces bucket was created
+	// +kubebuilder:validation:Optional
+	CreationDate string `json:"creationDate,omitempty"`
+}
+
+// A DOSpaceSpec represents the desired state of a DigitalOcean S3 bucket.
 type DOSpaceSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
 	ForProvider       DOSpaceParameters `json:"forProvider"`
 }
 
+// DOSpaceStatus represents the observed state of a DigitalOcean S3 bucket.
 type DOSpaceStatus struct {
 	xpv1.ResourceStatus `json:",inline"`
 	AtProvider          DOSpaceObservation `json:"atProvider,omitempty"`
 }
 
+// DOSpace is a managed resource that represents an S3 bucket at DigitalOcean.
+// +kubebuilder:object:root=true
+// +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
+// +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster,categories={crossplane,managed,do}
 type DOSpace struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -98,6 +106,8 @@ type DOSpace struct {
 	Status DOSpaceStatus `json:"status,omitempty"`
 }
 
+// DOSpaceList represents a list of DOSpace resources
+// +kubebuilder:object:root=true
 type DOSpaceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
