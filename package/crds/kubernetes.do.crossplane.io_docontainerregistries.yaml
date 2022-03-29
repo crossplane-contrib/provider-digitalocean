@@ -140,6 +140,7 @@ spec:
                     type: string
                   storage_usage_bytes:
                     description: The amount of storage used in the registry in bytes.
+                    format: int64
                     type: integer
                   storage_usage_bytes_updated_at:
                     description: The time at which the storage usage was updated.
@@ -165,19 +166,23 @@ spec:
                           included_bandwidth_bytes:
                             description: The amount of outbound data transfer included
                               in the subscription tier in bytes.
+                            format: int64
                             type: integer
                           included_repositories:
                             description: The number of repositories included in the
                               subscription tier. 0 indicates that the subscription
                               tier includes unlimited repositories.
+                            format: int64
                             type: integer
                           included_storage_bytes:
                             description: The amount of storage included in the subscription
                               tier in bytes.
+                            format: int64
                             type: integer
                           monthly_price_in_cents:
                             description: The monthly cost of the subscription tier
                               in cents.
+                            format: int64
                             type: integer
                           name:
                             description: The name of the subscription tier.

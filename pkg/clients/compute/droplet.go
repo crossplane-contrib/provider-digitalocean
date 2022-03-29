@@ -54,11 +54,11 @@ func generateImage(param string) godo.DropletCreateImage {
 
 func generateSSHKeys(param []string) []godo.DropletCreateSSHKey {
 	keys := make([]godo.DropletCreateSSHKey, len(param))
-	for _, k := range param {
+	for i, k := range param {
 		if id, err := strconv.Atoi(k); err == nil {
-			keys = append(keys, godo.DropletCreateSSHKey{ID: id})
+			keys[i] = godo.DropletCreateSSHKey{ID: id}
 		} else {
-			keys = append(keys, godo.DropletCreateSSHKey{Fingerprint: k})
+			keys[i] = godo.DropletCreateSSHKey{Fingerprint: k}
 		}
 	}
 	return keys
@@ -66,11 +66,11 @@ func generateSSHKeys(param []string) []godo.DropletCreateSSHKey {
 
 func generateVolumes(param []string) []godo.DropletCreateVolume {
 	volumes := make([]godo.DropletCreateVolume, len(param))
-	for _, v := range param {
+	for i, v := range param {
 		if v == "" {
 			continue
 		}
-		volumes = append(volumes, godo.DropletCreateVolume{ID: v})
+		volumes[i] = godo.DropletCreateVolume{ID: v}
 	}
 	return volumes
 }

@@ -15,9 +15,7 @@ package kubernetes
 
 import (
 	"context"
-	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
-	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
-	dok8s "github.com/crossplane-contrib/provider-digitalocean/pkg/clients/kubernetes"
+
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 	"github.com/crossplane/crossplane-runtime/pkg/event"
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
@@ -29,6 +27,10 @@ import (
 	"github.com/pkg/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
+	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
+	dok8s "github.com/crossplane-contrib/provider-digitalocean/pkg/clients/kubernetes"
 )
 
 const (

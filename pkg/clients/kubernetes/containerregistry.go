@@ -14,12 +14,13 @@ limitations under the License.
 package kubernetes
 
 import (
+	"github.com/digitalocean/godo"
+
 	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
 	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
-	"github.com/digitalocean/godo"
 )
 
-// GenerateKubernetes generates *godo.RegistryCreateRequest instance from DOContainerRegistryParameters.
+// GenerateContainerRegistry generates *godo.RegistryCreateRequest instance from DOContainerRegistryParameters.
 func GenerateContainerRegistry(name string, in v1alpha1.DOContainerRegistryParameters, create *godo.RegistryCreateRequest) {
 	create.Name = name
 	create.SubscriptionTierSlug = in.SubscriptionTier

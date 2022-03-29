@@ -18,9 +18,10 @@ package clients
 
 import (
 	"context"
-	"github.com/digitalocean/godo"
 	"net/http"
 	"strings"
+
+	"github.com/digitalocean/godo"
 
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
