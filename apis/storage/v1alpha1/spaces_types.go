@@ -92,8 +92,9 @@ type DOSpaceStatus struct {
 	AtProvider          DOSpaceObservation `json:"atProvider,omitempty"`
 }
 
-// DOSpace is a managed resource that represents an S3 bucket at DigitalOcean.
 // +kubebuilder:object:root=true
+
+// DOSpace is a managed resource that represents an S3 bucket at DigitalOcean.
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:subresource:status
@@ -106,8 +107,9 @@ type DOSpace struct {
 	Status DOSpaceStatus `json:"status,omitempty"`
 }
 
-// DOSpaceList represents a list of DOSpace resources
 // +kubebuilder:object:root=true
+
+// DOSpaceList represents a list of DOSpace resource.
 type DOSpaceList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`

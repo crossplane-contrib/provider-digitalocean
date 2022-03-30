@@ -17,5 +17,8 @@ func GenerateSpace(name string, in v1alpha1.DOSpaceParameters, create *s3.Create
 	create.GrantReadACP = in.GrantReadACP
 	create.GrantWrite = in.GrantWrite
 	create.GrantWriteACP = in.GrantWriteACP
-	create.ObjectOwnership = *in.ObjectOwnership
+
+	if in.ObjectOwnership != nil {
+		create.ObjectOwnership = *in.ObjectOwnership
+	}
 }
