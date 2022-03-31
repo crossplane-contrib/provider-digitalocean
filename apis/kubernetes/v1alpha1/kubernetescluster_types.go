@@ -22,6 +22,7 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 )
 
+// KubernetesStateType are the various states that the DOKubernetesCluster and it's components can be in
 type KubernetesStateType string
 
 // Known Kubernetes Cluster Statuses

@@ -107,23 +107,7 @@ func (c *k8sExternal) Observe(ctx context.Context, mg resource.Managed) (managed
 	}
 
 	cr.Status.AtProvider = dok8s.GenerateObservation(observed)
-
-	switch cr.Status.AtProvider.Status.State {
-	case v1alpha1.KubernetesStateProvisioning:
-		cr.Status.SetConditions(xpv1.Creating())
-	case v1alpha1.KubernetesStateRunning:
-		fallthrough
-	case v1alpha1.KubernetesStateDegraded: // Still available just in a poor state
-		cr.Status.SetConditions(xpv1.Available())
-	case v1alpha1.KubernetesStateDeleting:
-		fallthrough
-	case v1alpha1.KubernetesStateDeleted:
-		cr.Status.SetConditions(xpv1.Deleting())
-	case v1alpha1.KubernetesStateError:
-		fallthrough
-	case v1alpha1.KubernetesStateUpgrading:
-		cr.Status.SetConditions(xpv1.Unavailable())
-	}
+	dok8s.SetCondition(cr)
 
 	extObs := managed.ExternalObservation{
 		ResourceExists:   true,
