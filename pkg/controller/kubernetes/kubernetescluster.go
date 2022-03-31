@@ -226,5 +226,5 @@ func (c *k8sExternal) Delete(ctx context.Context, mg resource.Managed) error {
 	cr.Status.SetConditions(xpv1.Deleting())
 
 	response, err := c.Kubernetes.Delete(ctx, cr.Status.AtProvider.ID)
-	return errors.Wrap(dok8s.IgnoreNotFound(err, response), errK8sDeleteFailed)
+	return errors.Wrap(do.IgnoreNotFound(err, response), errK8sDeleteFailed)
 }
