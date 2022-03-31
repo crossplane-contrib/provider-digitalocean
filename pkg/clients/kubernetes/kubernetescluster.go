@@ -59,6 +59,104 @@ func GenerateKubernetes(name string, in v1alpha1.DOKubernetesClusterParameters, 
 	}
 }
 
+func GenerateObservation(observed *godo.KubernetesCluster) v1alpha1.DOKubernetesClusterObservation {
+	observation := v1alpha1.DOKubernetesClusterObservation{
+		ID:            observed.ID,
+		Name:          observed.Name,
+		Region:        observed.RegionSlug,
+		Version:       observed.VersionSlug,
+		ClusterSubnet: observed.ClusterSubnet,
+		ServiceSubnet: observed.ServiceSubnet,
+		VPCUUID:       observed.VPCUUID,
+		IPV4:          observed.IPv4,
+		Endpoint:      observed.Endpoint,
+		Tags:          observed.Tags,
+		MaintenancePolicy: v1alpha1.KubernetesClusterMaintenancePolicyObservation{
+			Policy: v1alpha1.KubernetesClusterMaintenancePolicy{
+				StartTime: observed.MaintenancePolicy.StartTime,
+				Day:       observed.MaintenancePolicy.Day.String(),
+			},
+			Duration: observed.MaintenancePolicy.Duration,
+		},
+		AutoUpgrade: observed.AutoUpgrade,
+		Status: v1alpha1.KubernetesStatus{
+			State:   GetStateFromGodoState(observed.Status.State),
+			Message: observed.Status.Message,
+		},
+		CreatedAt:       observed.CreatedAt.String(),
+		UpdatedAt:       observed.UpdatedAt.String(),
+		SurgeUpgrade:    observed.SurgeUpgrade,
+		HighlyAvailable: observed.HA,
+		RegistryEnabled: observed.RegistryEnabled,
+	}
+
+	observation.NodePools = make([]v1alpha1.KubernetesNodePoolObservation, len(observed.NodePools))
+	for i, nodePool := range observed.NodePools {
+		observation.NodePools[i] = v1alpha1.KubernetesNodePoolObservation{
+			ID:        nodePool.ID,
+			Size:      nodePool.Size,
+			Name:      nodePool.Name,
+			Count:     nodePool.Count,
+			Tags:      nodePool.Tags,
+			Labels:    nodePool.Labels,
+			AutoScale: nodePool.AutoScale,
+			MinNodes:  nodePool.MinNodes,
+			MaxNodes:  nodePool.MaxNodes,
+		}
+
+		observation.NodePools[i].Taints = make([]v1alpha1.KubernetesNodePoolTaint, len(nodePool.Taints))
+		for taintIndex, taint := range nodePool.Taints {
+			observation.NodePools[i].Taints[taintIndex] = v1alpha1.KubernetesNodePoolTaint{
+				Key:    taint.Key,
+				Value:  taint.Value,
+				Effect: taint.Effect,
+			}
+		}
+
+		observation.NodePools[i].Nodes = make([]v1alpha1.KubernetesNode, len(nodePool.Nodes))
+		for nodeIndex, node := range nodePool.Nodes {
+			observation.NodePools[i].Nodes[nodeIndex] = v1alpha1.KubernetesNode{
+				ID:   node.ID,
+				Name: node.Name,
+				Status: v1alpha1.KubernetesStatus{
+					State:   GetStateFromString(node.Status.State),
+					Message: node.Status.Message,
+				},
+				DropletID: node.DropletID,
+				CreatedAt: node.CreatedAt.String(),
+				UpdatedAt: node.UpdatedAt.String(),
+			}
+		}
+	}
+
+	return observation
+}
+
+func GetStateFromGodoState(state godo.KubernetesClusterStatusState) v1alpha1.KubernetesStateType {
+	return GetStateFromString(string(state))
+}
+
+func GetStateFromString(state string) v1alpha1.KubernetesStateType {
+	switch state {
+	case "running":
+		return v1alpha1.KubernetesStateRunning
+	case "provisioning":
+		return v1alpha1.KubernetesStateProvisioning
+	case "degraded":
+		return v1alpha1.KubernetesStateDegraded
+	case "error":
+		return v1alpha1.KubernetesStateError
+	case "deleted":
+		return v1alpha1.KubernetesStateDeleted
+	case "upgrading":
+		return v1alpha1.KubernetesStateUpgrading
+	case "deleting":
+		return v1alpha1.KubernetesStateDeleting
+	default:
+		return v1alpha1.KubernetesStateError // Just return an error if we can't find the state
+	}
+}
+
 func getDayFromParam(day string) godo.KubernetesMaintenancePolicyDay {
 	switch day {
 	case "monday":

@@ -43,6 +43,7 @@ const (
 	errK8sCreateFailed = "creation of DOKubernetesCluster resource has failed"
 	errK8sDeleteFailed = "deletion of DOKubernetesCluster resource has failed"
 	errK8sUpdate       = "cannot update managed DOKubernetesCluster resource"
+	errFetchingConfig  = "fetching of DOKubernetesCluster Kubeconfig has failed"
 )
 
 // SetupKubernetesCluster adds a controller that reconciles DOKubernetesCluster managed
@@ -57,7 +58,6 @@ func SetupKubernetesCluster(mgr ctrl.Manager, l logging.Logger) error {
 			resource.ManagedKind(v1alpha1.DOKubernetesClusterGroupVersionKind),
 			managed.WithExternalConnecter(&k8sConnector{kube: mgr.GetClient()}),
 			managed.WithReferenceResolver(managed.NewAPISimpleReferenceResolver(mgr.GetClient())),
-			managed.WithConnectionPublishers(),
 			managed.WithInitializers(managed.NewDefaultProviderConfig(mgr.GetClient())),
 			managed.WithLogger(l.WithValues("controller", name)),
 			managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name)))))
@@ -106,79 +106,43 @@ func (c *k8sExternal) Observe(ctx context.Context, mg resource.Managed) (managed
 		}
 	}
 
-	cr.Status.AtProvider = v1alpha1.DOKubernetesClusterObservation{
-		ID:            observed.ID,
-		Name:          observed.Name,
-		Region:        observed.RegionSlug,
-		Version:       observed.VersionSlug,
-		ClusterSubnet: observed.ClusterSubnet,
-		ServiceSubnet: observed.ServiceSubnet,
-		VPCUUID:       observed.VPCUUID,
-		IPV4:          observed.IPv4,
-		Endpoint:      observed.Endpoint,
-		Tags:          observed.Tags,
-		MaintenancePolicy: v1alpha1.KubernetesClusterMaintenancePolicyObservation{
-			Policy: v1alpha1.KubernetesClusterMaintenancePolicy{
-				StartTime: observed.MaintenancePolicy.StartTime,
-				Day:       observed.MaintenancePolicy.Day.String(),
-			},
-			Duration: observed.MaintenancePolicy.Duration,
-		},
-		AutoUpgrade: observed.AutoUpgrade,
-		Status: v1alpha1.KubernetesStatus{
-			State:   string(observed.Status.State),
-			Message: observed.Status.Message,
-		},
-		CreatedAt:       observed.CreatedAt.String(),
-		UpdatedAt:       observed.UpdatedAt.String(),
-		SurgeUpgrade:    observed.SurgeUpgrade,
-		HighlyAvailable: observed.HA,
-		RegistryEnabled: observed.RegistryEnabled,
+	cr.Status.AtProvider = dok8s.GenerateObservation(observed)
+
+	switch cr.Status.AtProvider.Status.State {
+	case v1alpha1.KubernetesStateProvisioning:
+		cr.Status.SetConditions(xpv1.Creating())
+	case v1alpha1.KubernetesStateRunning:
+		fallthrough
+	case v1alpha1.KubernetesStateDegraded: // Still available just in a poor state
+		cr.Status.SetConditions(xpv1.Available())
+	case v1alpha1.KubernetesStateDeleting:
+		fallthrough
+	case v1alpha1.KubernetesStateDeleted:
+		cr.Status.SetConditions(xpv1.Deleting())
+	case v1alpha1.KubernetesStateError:
+		fallthrough
+	case v1alpha1.KubernetesStateUpgrading:
+		cr.Status.SetConditions(xpv1.Unavailable())
 	}
 
-	cr.Status.AtProvider.NodePools = make([]v1alpha1.KubernetesNodePoolObservation, len(observed.NodePools))
-	for i, nodePool := range observed.NodePools {
-		cr.Status.AtProvider.NodePools[i] = v1alpha1.KubernetesNodePoolObservation{
-			ID:        nodePool.ID,
-			Size:      nodePool.Size,
-			Name:      nodePool.Name,
-			Count:     nodePool.Count,
-			Tags:      nodePool.Tags,
-			Labels:    nodePool.Labels,
-			AutoScale: nodePool.AutoScale,
-			MinNodes:  nodePool.MinNodes,
-			MaxNodes:  nodePool.MaxNodes,
-		}
-
-		cr.Status.AtProvider.NodePools[i].Taints = make([]v1alpha1.KubernetesNodePoolTaint, len(nodePool.Taints))
-		for taintIndex, taint := range nodePool.Taints {
-			cr.Status.AtProvider.NodePools[i].Taints[taintIndex] = v1alpha1.KubernetesNodePoolTaint{
-				Key:    taint.Key,
-				Value:  taint.Value,
-				Effect: taint.Effect,
-			}
-		}
-
-		cr.Status.AtProvider.NodePools[i].Nodes = make([]v1alpha1.KubernetesNode, len(nodePool.Nodes))
-		for nodeIndex, node := range nodePool.Nodes {
-			cr.Status.AtProvider.NodePools[i].Nodes[nodeIndex] = v1alpha1.KubernetesNode{
-				ID:   node.ID,
-				Name: node.Name,
-				Status: v1alpha1.KubernetesStatus{
-					State:   node.Status.State,
-					Message: node.Status.Message,
-				},
-				DropletID: node.DropletID,
-				CreatedAt: node.CreatedAt.String(),
-				UpdatedAt: node.UpdatedAt.String(),
-			}
-		}
-	}
-
-	return managed.ExternalObservation{
+	extObs := managed.ExternalObservation{
 		ResourceExists:   true,
 		ResourceUpToDate: true,
-	}, nil
+	}
+
+	if cr.Spec.WriteConnectionSecretToReference != nil {
+		config, resp, err := c.Kubernetes.GetKubeConfig(ctx, observed.ID)
+
+		if err != nil || resp.StatusCode >= 300 {
+			return managed.ExternalObservation{}, errors.Wrap(err, errFetchingConfig)
+		}
+
+		extObs.ConnectionDetails = managed.ConnectionDetails{
+			xpv1.ResourceCredentialsSecretKubeconfigKey: config.KubeconfigYAML,
+		}
+	}
+
+	return extObs, nil
 }
 
 func (c *k8sExternal) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
@@ -209,7 +173,8 @@ func (c *k8sExternal) Create(ctx context.Context, mg resource.Managed) (managed.
 	}
 
 	meta.SetExternalName(cr, k8s.ID)
-	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
+
+	return managed.ExternalCreation{}, nil
 }
 
 func (c *k8sExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
