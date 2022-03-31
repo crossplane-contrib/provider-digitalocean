@@ -72,7 +72,7 @@ kubectl apply -f https://raw.githubusercontent.com/crossplane-contrib/provider-d
 1. Encode that token using base64, and in the `config.yaml` file, replace `BASE64ENCODED_PROVIDER_CREDS` with your encoded token
 1. Create a new Secret and ProviderConfig with 
 ```console
-kubectl apply -f https://raw.githubusercontent.com/crossplane-contrib/provider-digitalocean/main/examples/provider/config.yaml
+kubectl apply -f config.yaml
 ```
 1. Check that the Provider has been created by running 
 
