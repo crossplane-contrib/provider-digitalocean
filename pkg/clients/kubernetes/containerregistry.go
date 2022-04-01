@@ -29,7 +29,32 @@ func GenerateContainerRegistry(name string, in v1alpha1.DOContainerRegistryParam
 
 // RegistryLateInitializeSpec updates any unset (i.e. nil) optional fields of the
 // supplied DOContainerRegistryParameters that are set (i.e. non-zero) on the supplied
-// Kubernetes Cluster.
+// Container Registry.
 func RegistryLateInitializeSpec(p *v1alpha1.DOContainerRegistryParameters, observed godo.Registry) {
 	p.Region = do.LateInitializeString(p.Region, observed.Region)
+}
+
+// GenerateContainerRegistryObservation generates DOContainerRegistryObservation instance
+// from godo.Registry and godo.RegistrySubscription
+func GenerateContainerRegistryObservation(registry *godo.Registry, subscription *godo.RegistrySubscription) v1alpha1.DOContainerRegistryObservation {
+	return v1alpha1.DOContainerRegistryObservation{
+		Name:                       registry.Name,
+		Region:                     registry.Region,
+		CreatedAt:                  registry.CreatedAt.String(),
+		StorageUsageBytes:          registry.StorageUsageBytes,
+		StorageUsageBytesUpdatedAt: registry.StorageUsageBytesUpdatedAt.String(),
+		Subscription: v1alpha1.Subscription{
+			Tier: v1alpha1.Tier{
+				Name:                   subscription.Tier.Name,
+				Slug:                   subscription.Tier.Slug,
+				IncludedRepositories:   subscription.Tier.IncludedRepositories,
+				IncludedStorageBytes:   subscription.Tier.IncludedStorageBytes,
+				AllowStorageOverage:    subscription.Tier.AllowStorageOverage,
+				IncludedBandwidthBytes: subscription.Tier.IncludedBandwidthBytes,
+				MonthlyPriceInCents:    subscription.Tier.MonthlyPriceInCents,
+			},
+			CreatedAt: subscription.CreatedAt.String(),
+			UpdatedAt: subscription.UpdatedAt.String(),
+		},
+	}
 }

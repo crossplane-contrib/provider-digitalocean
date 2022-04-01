@@ -27,7 +27,6 @@ import (
 type DOContainerRegistryParameters struct {
 	// The slug of the subscription tier to sign up for.
 	// Valid values can be retrieved using the options endpoint.
-	// +immutable
 	SubscriptionTier string `json:"subscription_tier"`
 
 	// Slug of the region where registry data is stored.

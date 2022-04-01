@@ -35,13 +35,13 @@ import (
 
 const (
 	// Error strings.
-	errNotContianerRegistiry             = "managed resource is not a DOContainerRegistery resource"
-	errGetContianerRegistiry             = "cannot get DOContainerRegistery"
-	errGetContianerRegistirySubscription = "cannot get DOContainerRegistery subscrioption"
+	errNotContainerRegistry             = "managed resource is not a DOContainerRegistry resource"
+	errGetContainerRegistry             = "cannot get DOContainerRegistry"
+	errGetContainerRegistrySubscription = "cannot get DOContainerRegistry subscription"
 
-	errContianerRegistiryCreateFailed = "creation of DOContainerRegistery resource has failed"
-	errContianerRegistiryDeleteFailed = "deletion of DOContainerRegistery resource has failed"
-	errContianerRegistiryUpdate       = "cannot update managed DOContainerRegistery resource"
+	errContainerRegistryCreateFailed = "creation of DOContainerRegistry resource has failed"
+	errContainerRegistryDeleteFailed = "deletion of DOContainerRegistry resource has failed"
+	errContainerRegistryUpdate       = "cannot update managed DOContainerRegistry resource"
 
 	subscriptionOutDated = "subscription is not up to date"
 )
@@ -85,7 +85,7 @@ type containerRegistryExternal struct {
 func (c *containerRegistryExternal) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
 	cr, ok := mg.(*v1alpha1.DOContainerRegistry)
 	if !ok {
-		return managed.ExternalObservation{}, errors.New(errNotContianerRegistiry)
+		return managed.ExternalObservation{}, errors.New(errNotContainerRegistry)
 	}
 
 	if meta.GetExternalName(cr) == "" {
@@ -96,42 +96,26 @@ func (c *containerRegistryExternal) Observe(ctx context.Context, mg resource.Man
 
 	observed, response, err := c.Registry.Get(ctx)
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetContianerRegistiry)
+		cr.Status.SetConditions(xpv1.Unavailable())
+		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetContainerRegistry)
 	}
+
+	cr.Status.SetConditions(xpv1.Available())
 
 	subscription, response, err := c.Registry.GetSubscription(ctx)
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetContianerRegistirySubscription)
+		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetContainerRegistrySubscription)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
 	dok8s.RegistryLateInitializeSpec(&cr.Spec.ForProvider, *observed)
 	if !cmp.Equal(currentSpec, &cr.Spec.ForProvider) {
 		if err := c.kube.Update(ctx, cr); err != nil {
-			return managed.ExternalObservation{}, errors.Wrap(err, errContianerRegistiryUpdate)
+			return managed.ExternalObservation{}, errors.Wrap(err, errContainerRegistryUpdate)
 		}
 	}
 
-	cr.Status.AtProvider = v1alpha1.DOContainerRegistryObservation{
-		Name:                       observed.Name,
-		Region:                     observed.Region,
-		CreatedAt:                  observed.CreatedAt.String(),
-		StorageUsageBytes:          observed.StorageUsageBytes,
-		StorageUsageBytesUpdatedAt: observed.StorageUsageBytesUpdatedAt.String(),
-		Subscription: v1alpha1.Subscription{
-			Tier: v1alpha1.Tier{
-				Name:                   subscription.Tier.Name,
-				Slug:                   subscription.Tier.Slug,
-				IncludedRepositories:   subscription.Tier.IncludedRepositories,
-				IncludedStorageBytes:   subscription.Tier.IncludedStorageBytes,
-				AllowStorageOverage:    subscription.Tier.AllowStorageOverage,
-				IncludedBandwidthBytes: subscription.Tier.IncludedBandwidthBytes,
-				MonthlyPriceInCents:    subscription.Tier.MonthlyPriceInCents,
-			},
-			CreatedAt: subscription.CreatedAt.String(),
-			UpdatedAt: subscription.UpdatedAt.String(),
-		},
-	}
+	cr.Status.AtProvider = dok8s.GenerateContainerRegistryObservation(observed, subscription)
 
 	if cr.Spec.ForProvider.SubscriptionTier != cr.Status.AtProvider.Subscription.Tier.Slug {
 		return managed.ExternalObservation{
@@ -150,13 +134,13 @@ func (c *containerRegistryExternal) Observe(ctx context.Context, mg resource.Man
 func (c *containerRegistryExternal) Create(ctx context.Context, mg resource.Managed) (managed.ExternalCreation, error) {
 	cr, ok := mg.(*v1alpha1.DOContainerRegistry)
 	if !ok {
-		return managed.ExternalCreation{}, errors.New(errNotContianerRegistiry)
+		return managed.ExternalCreation{}, errors.New(errNotContainerRegistry)
 	}
 
-	cr.Status.SetConditions(xpv1.Creating())
+	cr.Status.SetConditions(xpv1.Creating(), xpv1.Unavailable())
 
 	name := meta.GetExternalName(cr)
-	if meta.GetExternalName(cr) == "" {
+	if name == "" {
 		name = cr.GetName()
 	}
 
@@ -165,7 +149,7 @@ func (c *containerRegistryExternal) Create(ctx context.Context, mg resource.Mana
 
 	containerRegistry, _, err := c.Registry.Create(ctx, create)
 	if err != nil || containerRegistry == nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, errContianerRegistiryCreateFailed)
+		return managed.ExternalCreation{}, errors.Wrap(err, errContainerRegistryCreateFailed)
 	}
 
 	if meta.GetExternalName(cr) == "" {
@@ -178,13 +162,13 @@ func (c *containerRegistryExternal) Create(ctx context.Context, mg resource.Mana
 func (c *containerRegistryExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
 	cr, ok := mg.(*v1alpha1.DOContainerRegistry)
 	if !ok {
-		return managed.ExternalUpdate{}, errors.New(errNotContianerRegistiry)
+		return managed.ExternalUpdate{}, errors.New(errNotContainerRegistry)
 	}
 	update := &godo.RegistrySubscriptionUpdateRequest{TierSlug: cr.Spec.ForProvider.SubscriptionTier}
 
 	containerRegistry, _, err := c.Registry.UpdateSubscription(ctx, update)
 	if err != nil || containerRegistry == nil {
-		return managed.ExternalUpdate{}, errors.Wrap(err, errContianerRegistiryUpdate)
+		return managed.ExternalUpdate{}, errors.Wrap(err, errContainerRegistryUpdate)
 	}
 
 	return managed.ExternalUpdate{}, nil
@@ -193,11 +177,11 @@ func (c *containerRegistryExternal) Update(ctx context.Context, mg resource.Mana
 func (c *containerRegistryExternal) Delete(ctx context.Context, mg resource.Managed) error {
 	cr, ok := mg.(*v1alpha1.DOContainerRegistry)
 	if !ok {
-		return errors.New(errNotContianerRegistiry)
+		return errors.New(errNotContainerRegistry)
 	}
 
 	cr.Status.SetConditions(xpv1.Deleting())
 
 	response, err := c.Registry.Delete(ctx)
-	return errors.Wrap(do.IgnoreNotFound(err, response), errContianerRegistiryDeleteFailed)
+	return errors.Wrap(do.IgnoreNotFound(err, response), errContainerRegistryDeleteFailed)
 }
