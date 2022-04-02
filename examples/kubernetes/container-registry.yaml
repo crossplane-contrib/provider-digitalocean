@@ -6,5 +6,5 @@ spec:
   providerConfigRef:
     name: example
   forProvider:
-    subscription_tier: "starter"
+    subscriptionTier: "starter"
     region: "ams3"
