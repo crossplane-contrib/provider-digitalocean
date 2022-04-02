@@ -158,7 +158,7 @@ spec:
                         description: An object specifying the subscription tier for
                           a Container Registry.
                         properties:
-                          allowStorageOverrage:
+                          allowStorageOverage:
                             description: A boolean indicating whether the subscription
                               tier supports additional storage above what is included
                               in the base plan at an additional cost per GiB used.
@@ -191,7 +191,7 @@ spec:
                             description: The slug identifier of the subscription tier.
                             type: string
                         required:
-                        - allowStorageOverrage
+                        - allowStorageOverage
                         - includedBandwidthBytes
                         - includedRepositories
                         - includedStorageBytes

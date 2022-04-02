@@ -53,7 +53,7 @@ type Tier struct {
 
 	// A boolean indicating whether the subscription tier supports
 	// additional storage above what is included in the base plan at an additional cost per GiB used.
-	AllowStorageOverage bool `json:"allowStorageOverrage"`
+	AllowStorageOverage bool `json:"allowStorageOverage"`
 
 	// The amount of outbound data transfer included in the subscription tier in bytes.
 	IncludedBandwidthBytes uint64 `json:"includedBandwidthBytes"`
