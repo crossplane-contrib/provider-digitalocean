@@ -27,7 +27,7 @@ import (
 type DOContainerRegistryParameters struct {
 	// The slug of the subscription tier to sign up for.
 	// Valid values can be retrieved using the options endpoint.
-	SubscriptionTier string `json:"subscription_tier"`
+	SubscriptionTier string `json:"subscriptionTier"`
 
 	// Slug of the region where registry data is stored.
 	// When not provided, a region will be selected.
@@ -46,20 +46,20 @@ type Tier struct {
 
 	// The number of repositories included in the subscription tier.
 	// 0 indicates that the subscription tier includes unlimited repositories.
-	IncludedRepositories uint64 `json:"included_repositories"`
+	IncludedRepositories uint64 `json:"includedRepositories"`
 
 	// The amount of storage included in the subscription tier in bytes.
-	IncludedStorageBytes uint64 `json:"included_storage_bytes"`
+	IncludedStorageBytes uint64 `json:"includedStorageBytes"`
 
 	// A boolean indicating whether the subscription tier supports
 	// additional storage above what is included in the base plan at an additional cost per GiB used.
-	AllowStorageOverage bool `json:"allow_storage_overrage"`
+	AllowStorageOverage bool `json:"allowStorageOverrage"`
 
 	// The amount of outbound data transfer included in the subscription tier in bytes.
-	IncludedBandwidthBytes uint64 `json:"included_bandwidth_bytes"`
+	IncludedBandwidthBytes uint64 `json:"includedBandwidthBytes"`
 
 	// The monthly cost of the subscription tier in cents.
-	MonthlyPriceInCents uint64 `json:"monthly_price_in_cents"`
+	MonthlyPriceInCents uint64 `json:"monthlyPriceInCents"`
 }
 
 // The Subscription defines a subscription for a Container Registry.
@@ -68,10 +68,10 @@ type Subscription struct {
 	Tier Tier `json:"tier"`
 
 	// The time at which the subscription was created.
-	CreatedAt string `json:"created_at"`
+	CreatedAt string `json:"createdAt"`
 
 	// The time at which the subscription was last updated.
-	UpdatedAt string `json:"updated_at"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 // A DOContainerRegistryObservation reflects the observed state of a Container Registry on DigitalOcean.
@@ -81,17 +81,17 @@ type DOContainerRegistryObservation struct {
 	Name string `json:"name"`
 
 	// A time value given in ISO8601 combined date and time format that represents when the registry was created.
-	CreatedAt string `json:"created_at"`
+	CreatedAt string `json:"createdAt"`
 
 	// Slug of the region where registry data is stored.
 	Region string `json:"region"`
 
 	// The amount of storage used in the registry in bytes.
-	StorageUsageBytes uint64 `json:"storage_usage_bytes"`
+	StorageUsageBytes uint64 `json:"storageUsageBytes"`
 
 	// The time at which the storage usage was updated.
 	// Storage usage is calculated asynchronously, and may not immediately reflect pushes to the registry.
-	StorageUsageBytesUpdatedAt string `json:"storage_usage_bytes_updated_at"`
+	StorageUsageBytesUpdatedAt string `json:"storageUsageBytesUpdatedAt"`
 
 	// An object specifying the subscription for a Container Registry.
 	Subscription Subscription `json:"subscription"`

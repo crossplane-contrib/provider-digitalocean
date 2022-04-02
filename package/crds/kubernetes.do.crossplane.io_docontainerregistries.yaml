@@ -67,12 +67,12 @@ spec:
                     description: Slug of the region where registry data is stored.
                       When not provided, a region will be selected.
                     type: string
-                  subscription_tier:
+                  subscriptionTier:
                     description: The slug of the subscription tier to sign up for.
                       Valid values can be retrieved using the options endpoint.
                     type: string
                 required:
-                - subscription_tier
+                - subscriptionTier
                 type: object
               providerConfigRef:
                 default:
@@ -126,7 +126,7 @@ spec:
                 description: A DOContainerRegistryObservation reflects the observed
                   state of a Container Registry on DigitalOcean.
                 properties:
-                  created_at:
+                  createdAt:
                     description: A time value given in ISO8601 combined date and time
                       format that represents when the registry was created.
                     type: string
@@ -138,11 +138,11 @@ spec:
                   region:
                     description: Slug of the region where registry data is stored.
                     type: string
-                  storage_usage_bytes:
+                  storageUsageBytes:
                     description: The amount of storage used in the registry in bytes.
                     format: int64
                     type: integer
-                  storage_usage_bytes_updated_at:
+                  storageUsageBytesUpdatedAt:
                     description: The time at which the storage usage was updated.
                       Storage usage is calculated asynchronously, and may not immediately
                       reflect pushes to the registry.
@@ -151,35 +151,35 @@ spec:
                     description: An object specifying the subscription for a Container
                       Registry.
                     properties:
-                      created_at:
+                      createdAt:
                         description: The time at which the subscription was created.
                         type: string
                       tier:
                         description: An object specifying the subscription tier for
                           a Container Registry.
                         properties:
-                          allow_storage_overrage:
+                          allowStorageOverrage:
                             description: A boolean indicating whether the subscription
                               tier supports additional storage above what is included
                               in the base plan at an additional cost per GiB used.
                             type: boolean
-                          included_bandwidth_bytes:
+                          includedBandwidthBytes:
                             description: The amount of outbound data transfer included
                               in the subscription tier in bytes.
                             format: int64
                             type: integer
-                          included_repositories:
+                          includedRepositories:
                             description: The number of repositories included in the
                               subscription tier. 0 indicates that the subscription
                               tier includes unlimited repositories.
                             format: int64
                             type: integer
-                          included_storage_bytes:
+                          includedStorageBytes:
                             description: The amount of storage included in the subscription
                               tier in bytes.
                             format: int64
                             type: integer
-                          monthly_price_in_cents:
+                          monthlyPriceInCents:
                             description: The monthly cost of the subscription tier
                               in cents.
                             format: int64
@@ -191,28 +191,28 @@ spec:
                             description: The slug identifier of the subscription tier.
                             type: string
                         required:
-                        - allow_storage_overrage
-                        - included_bandwidth_bytes
-                        - included_repositories
-                        - included_storage_bytes
-                        - monthly_price_in_cents
+                        - allowStorageOverrage
+                        - includedBandwidthBytes
+                        - includedRepositories
+                        - includedStorageBytes
+                        - monthlyPriceInCents
                         - name
                         - slug
                         type: object
-                      updated_at:
+                      updatedAt:
                         description: The time at which the subscription was last updated.
                         type: string
                     required:
-                    - created_at
+                    - createdAt
                     - tier
-                    - updated_at
+                    - updatedAt
                     type: object
                 required:
-                - created_at
+                - createdAt
                 - name
                 - region
-                - storage_usage_bytes
-                - storage_usage_bytes_updated_at
+                - storageUsageBytes
+                - storageUsageBytesUpdatedAt
                 - subscription
                 type: object
               conditions:
