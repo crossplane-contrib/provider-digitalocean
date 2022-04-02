@@ -79,7 +79,7 @@ spec:
                     description: 'Monitoring: A boolean indicating whether to install
                       the DigitalOcean agent for monitoring.'
                     type: boolean
-                  private_networking:
+                  privateNetworking:
                     description: 'PrivateNetworking: This parameter has been deprecated.
                       Use ''vpc_uuid'' instead to specify a VPC network for the Droplet.
                       If no `vpc_uuid` is provided, the Droplet will be placed in
@@ -93,7 +93,7 @@ spec:
                     description: 'Size: The unique slug identifier for the size that
                       you wish to select for this Droplet.'
                     type: string
-                  ssh_keys:
+                  sshKeys:
                     description: 'SSHKeys: An array containing the IDs or fingerprints
                       of the SSH keys that you wish to embed in the Droplet''s root
                       account upon creation.'
@@ -115,13 +115,13 @@ spec:
                     items:
                       type: string
                     type: array
-                  vpc_uuid:
+                  vpcUuid:
                     description: 'VPCUUID: A string specifying the UUID of the VPC
                       to which the Droplet will be assigned. If excluded, beginning
                       on April 7th, 2020, the Droplet will be assigned to your account''s
                       default VPC for the region.'
                     type: string
-                  with_droplet_agent:
+                  withDropletAgent:
                     description: 'WithDropletAgent: A boolean indicating whether to
                       install the DigitalOcean agent used for providing access to
                       the Droplet web console in the control panel. To prevent it
