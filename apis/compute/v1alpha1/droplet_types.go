@@ -54,7 +54,7 @@ type DropletParameters struct {
 	// that you wish to embed in the Droplet's root account upon creation.
 	// +optional
 	// +immutable
-	SSHKeys []string `json:"ssh_keys,omitempty"`
+	SSHKeys []string `json:"sshKeys,omitempty"`
 
 	// Backups: A boolean indicating whether automated backups should be enabled
 	// for the Droplet. Automated backups can only be enabled when the Droplet is
@@ -73,7 +73,7 @@ type DropletParameters struct {
 	// provided, the Droplet will be placed in the default VPC.
 	// +optional
 	// +immutable
-	PrivateNetworking *bool `json:"private_networking,omitempty"`
+	PrivateNetworking *bool `json:"privateNetworking,omitempty"`
 
 	// Monitoring: A boolean indicating whether to install the DigitalOcean
 	// agent for monitoring.
@@ -99,7 +99,7 @@ type DropletParameters struct {
 	// will be assigned to your account's default VPC for the region.
 	// +optional
 	// +immutable
-	VPCUUID *string `json:"vpc_uuid,omitempty"`
+	VPCUUID *string `json:"vpcUuid,omitempty"`
 
 	// WithDropletAgent: A boolean indicating whether to install the DigitalOcean
 	// agent used for providing access to the Droplet web console in the control panel.
@@ -107,7 +107,7 @@ type DropletParameters struct {
 	// To make installation errors fatal, explicitly set it to true.
 	// +optional
 	// +immutable
-	WithDropletAgent *bool `json:"with_droplet_agent,omitempty"`
+	WithDropletAgent *bool `json:"withDropletAgent,omitempty"`
 }
 
 // A DropletObservation reflects the observed state of a Droplet on DigitalOcean.

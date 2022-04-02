@@ -17,8 +17,6 @@ limitations under the License.
 package loadbalancer
 
 import (
-	"net/http"
-
 	"github.com/digitalocean/godo"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/loadbalancer/v1alpha1"
@@ -75,17 +73,4 @@ func generateHealthCheck(in v1alpha1.DOLoadBalancerHealthCheck, inPort int) *god
 func LateInitializeSpec(p *v1alpha1.LBParameters, observed godo.LoadBalancer) {
 	p.Tags = do.LateInitializeStringSlice(p.Tags, observed.Tags)
 	p.VPCUUID = do.LateInitializeString(p.VPCUUID, observed.VPCUUID)
-}
-
-// IgnoreNotFound checks for response of DigitalOcean GET API call
-// and the content of returned error to ignore it if the response
-// is a '404 not found' error otherwise bubble up the error.
-func IgnoreNotFound(err error, response *godo.Response) error {
-	if err != nil && err.Error() == "lbID is invalid because cannot be less than 1" {
-		return nil
-	}
-	if response != nil && response.StatusCode == http.StatusNotFound {
-		return nil
-	}
-	return err
 }

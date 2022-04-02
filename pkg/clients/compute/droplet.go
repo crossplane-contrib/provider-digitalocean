@@ -17,7 +17,6 @@ limitations under the License.
 package compute
 
 import (
-	"net/http"
 	"strconv"
 
 	"github.com/digitalocean/godo"
@@ -55,11 +54,11 @@ func generateImage(param string) godo.DropletCreateImage {
 
 func generateSSHKeys(param []string) []godo.DropletCreateSSHKey {
 	keys := make([]godo.DropletCreateSSHKey, len(param))
-	for _, k := range param {
+	for i, k := range param {
 		if id, err := strconv.Atoi(k); err == nil {
-			keys = append(keys, godo.DropletCreateSSHKey{ID: id})
+			keys[i] = godo.DropletCreateSSHKey{ID: id}
 		} else {
-			keys = append(keys, godo.DropletCreateSSHKey{Fingerprint: k})
+			keys[i] = godo.DropletCreateSSHKey{Fingerprint: k}
 		}
 	}
 	return keys
@@ -67,11 +66,11 @@ func generateSSHKeys(param []string) []godo.DropletCreateSSHKey {
 
 func generateVolumes(param []string) []godo.DropletCreateVolume {
 	volumes := make([]godo.DropletCreateVolume, len(param))
-	for _, v := range param {
+	for i, v := range param {
 		if v == "" {
 			continue
 		}
-		volumes = append(volumes, godo.DropletCreateVolume{ID: v})
+		volumes[i] = godo.DropletCreateVolume{ID: v}
 	}
 	return volumes
 }
@@ -83,17 +82,4 @@ func LateInitializeSpec(p *v1alpha1.DropletParameters, observed godo.Droplet) {
 	p.Volumes = do.LateInitializeStringSlice(p.Volumes, observed.VolumeIDs)
 	p.Tags = do.LateInitializeStringSlice(p.Tags, observed.Tags)
 	p.VPCUUID = do.LateInitializeString(p.VPCUUID, observed.VPCUUID)
-}
-
-// IgnoreNotFound checks for response of DigitalOcean GET API call
-// and the content of returned error to ignore it if the response
-// is a '404 not found' error otherwise bubble up the error.
-func IgnoreNotFound(err error, response *godo.Response) error {
-	if err != nil && err.Error() == "dropletID is invalid because cannot be less than 1" {
-		return nil
-	}
-	if response != nil && response.StatusCode == http.StatusNotFound {
-		return nil
-	}
-	return err
 }

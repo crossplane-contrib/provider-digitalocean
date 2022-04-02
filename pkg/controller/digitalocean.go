@@ -17,9 +17,8 @@ limitations under the License.
 package controller
 
 import (
-	ctrl "sigs.k8s.io/controller-runtime"
-
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
+	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/compute"
 	"github.com/crossplane-contrib/provider-digitalocean/pkg/controller/config"
@@ -36,6 +35,7 @@ func Setup(mgr ctrl.Manager, l logging.Logger) error {
 		compute.SetupDroplet,
 		database.SetupDatabase,
 		kubernetes.SetupKubernetesCluster,
+		kubernetes.SetupDOContainerRegistry,
 		loadbalancer.SetupLB,
 	} {
 		if err := setup(mgr, l); err != nil {

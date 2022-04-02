@@ -1,0 +1,10 @@
+apiVersion: kubernetes.do.crossplane.io/v1alpha1
+kind: DOContainerRegistry
+metadata:
+  name: registrytest
+spec:
+  providerConfigRef:
+    name: example
+  forProvider:
+    subscriptionTier: "starter"
+    region: "ams3"

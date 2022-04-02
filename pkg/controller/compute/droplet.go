@@ -106,7 +106,7 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 
 	observed, response, err := c.Droplets.Get(ctx, externalID)
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(docompute.IgnoreNotFound(err, response), errGetDroplet)
+		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetDroplet)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
@@ -179,5 +179,5 @@ func (c *dropletExternal) Delete(ctx context.Context, mg resource.Managed) error
 	cr.Status.SetConditions(xpv1.Deleting())
 
 	response, err := c.Droplets.Delete(ctx, cr.Status.AtProvider.ID)
-	return errors.Wrap(docompute.IgnoreNotFound(err, response), errDropletDeleteFailed)
+	return errors.Wrap(do.IgnoreNotFound(err, response), errDropletDeleteFailed)
 }

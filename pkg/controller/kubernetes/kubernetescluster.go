@@ -95,7 +95,7 @@ func (c *k8sExternal) Observe(ctx context.Context, mg resource.Managed) (managed
 
 	observed, response, err := c.Kubernetes.Get(ctx, meta.GetExternalName(cr))
 	if err != nil {
-		return managed.ExternalObservation{}, errors.Wrap(dok8s.IgnoreNotFound(err, response), errGetK8s)
+		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetK8s)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
@@ -226,5 +226,5 @@ func (c *k8sExternal) Delete(ctx context.Context, mg resource.Managed) error {
 	cr.Status.SetConditions(xpv1.Deleting())
 
 	response, err := c.Databases.Delete(ctx, cr.Status.AtProvider.ID)
-	return errors.Wrap(dok8s.IgnoreNotFound(err, response), errK8sDeleteFailed)
+	return errors.Wrap(do.IgnoreNotFound(err, response), errK8sDeleteFailed)
 }

@@ -45,6 +45,15 @@ var (
 	DOKubernetesClusterGroupVersionKind = SchemeGroupVersion.WithKind(DOKubernetesClusterKind)
 )
 
+// DOContainerRegistry type metadata.
+var (
+	DOContainerRegistryKind             = reflect.TypeOf(DOContainerRegistry{}).Name()
+	DOContainerRegistryGroupKind        = schema.GroupKind{Group: Group, Kind: DOContainerRegistryKind}.String()
+	DOContainerRegistryKindAPIVersion   = DOContainerRegistryKind + "." + SchemeGroupVersion.String()
+	DOContainerRegistryGroupVersionKind = SchemeGroupVersion.WithKind(DOContainerRegistryKind)
+)
+
 func init() {
 	SchemeBuilder.Register(&DOKubernetesCluster{}, &DOKubernetesClusterList{})
+	SchemeBuilder.Register(&DOContainerRegistry{}, &DOContainerRegistryList{})
 }
