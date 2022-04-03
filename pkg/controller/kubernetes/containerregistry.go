@@ -74,12 +74,12 @@ func (c *containerRegistryConnector) Connect(ctx context.Context, mg resource.Ma
 		return nil, err
 	}
 	client := godo.NewFromToken(token)
-	return &containerRegistryExternal{Client: client, kube: c.kube}, nil
+	return &containerRegistryExternal{client: client.Registry, kube: c.kube}, nil
 }
 
 type containerRegistryExternal struct {
-	kube client.Client
-	*godo.Client
+	kube   client.Client
+	client dok8s.RegistryClient
 }
 
 func (c *containerRegistryExternal) Observe(ctx context.Context, mg resource.Managed) (managed.ExternalObservation, error) {
@@ -94,7 +94,7 @@ func (c *containerRegistryExternal) Observe(ctx context.Context, mg resource.Man
 		}, nil
 	}
 
-	observed, response, err := c.Registry.Get(ctx)
+	observed, response, err := c.client.Get(ctx)
 	if err != nil {
 		cr.Status.SetConditions(xpv1.Unavailable())
 		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetContainerRegistry)
@@ -102,7 +102,7 @@ func (c *containerRegistryExternal) Observe(ctx context.Context, mg resource.Man
 
 	cr.Status.SetConditions(xpv1.Available())
 
-	subscription, response, err := c.Registry.GetSubscription(ctx)
+	subscription, response, err := c.client.GetSubscription(ctx)
 	if err != nil {
 		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetContainerRegistrySubscription)
 	}
@@ -137,7 +137,7 @@ func (c *containerRegistryExternal) Create(ctx context.Context, mg resource.Mana
 		return managed.ExternalCreation{}, errors.New(errNotContainerRegistry)
 	}
 
-	cr.Status.SetConditions(xpv1.Creating(), xpv1.Unavailable())
+	cr.Status.SetConditions(xpv1.Creating())
 
 	name := meta.GetExternalName(cr)
 	if name == "" {
@@ -147,9 +147,11 @@ func (c *containerRegistryExternal) Create(ctx context.Context, mg resource.Mana
 	create := &godo.RegistryCreateRequest{}
 	dok8s.GenerateContainerRegistry(name, cr.Spec.ForProvider, create)
 
-	containerRegistry, _, err := c.Registry.Create(ctx, create)
+	containerRegistry, _, err := c.client.Create(ctx, create)
 	if err != nil || containerRegistry == nil {
-		return managed.ExternalCreation{}, errors.Wrap(err, errContainerRegistryCreateFailed)
+		err = errors.Wrap(err, errContainerRegistryCreateFailed)
+		cr.Status.SetConditions(xpv1.ReconcileError(err))
+		return managed.ExternalCreation{}, err
 	}
 
 	if meta.GetExternalName(cr) == "" {
@@ -166,9 +168,11 @@ func (c *containerRegistryExternal) Update(ctx context.Context, mg resource.Mana
 	}
 	update := &godo.RegistrySubscriptionUpdateRequest{TierSlug: cr.Spec.ForProvider.SubscriptionTier}
 
-	containerRegistry, _, err := c.Registry.UpdateSubscription(ctx, update)
+	containerRegistry, _, err := c.client.UpdateSubscription(ctx, update)
 	if err != nil || containerRegistry == nil {
-		return managed.ExternalUpdate{}, errors.Wrap(err, errContainerRegistryUpdate)
+		err = errors.Wrap(err, errContainerRegistryUpdate)
+		cr.Status.SetConditions(xpv1.ReconcileError(err))
+		return managed.ExternalUpdate{}, err
 	}
 
 	return managed.ExternalUpdate{}, nil
@@ -182,6 +186,12 @@ func (c *containerRegistryExternal) Delete(ctx context.Context, mg resource.Mana
 
 	cr.Status.SetConditions(xpv1.Deleting())
 
-	response, err := c.Registry.Delete(ctx)
-	return errors.Wrap(do.IgnoreNotFound(err, response), errContainerRegistryDeleteFailed)
+	response, err := c.client.Delete(ctx)
+	if err != nil {
+		err = errors.Wrap(do.IgnoreNotFound(err, response), errContainerRegistryDeleteFailed)
+		cr.Status.SetConditions(xpv1.ReconcileError(err))
+		return err
+
+	}
+	return nil
 }

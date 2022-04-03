@@ -14,11 +14,22 @@ limitations under the License.
 package kubernetes
 
 import (
+	"context"
+
 	"github.com/digitalocean/godo"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
 	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
 )
+
+// RegistryClient is the external client used for DOContainerRegistry Custom Resource
+type RegistryClient interface {
+	Get(context.Context) (*godo.Registry, *godo.Response, error)
+	GetSubscription(context.Context) (*godo.RegistrySubscription, *godo.Response, error)
+	Create(context.Context, *godo.RegistryCreateRequest) (*godo.Registry, *godo.Response, error)
+	UpdateSubscription(context.Context, *godo.RegistrySubscriptionUpdateRequest) (*godo.RegistrySubscription, *godo.Response, error)
+	Delete(context.Context) (*godo.Response, error)
+}
 
 // GenerateContainerRegistry generates *godo.RegistryCreateRequest instance from DOContainerRegistryParameters.
 func GenerateContainerRegistry(name string, in v1alpha1.DOContainerRegistryParameters, create *godo.RegistryCreateRequest) {
