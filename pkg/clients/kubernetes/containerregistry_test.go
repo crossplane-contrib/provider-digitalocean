@@ -52,7 +52,7 @@ func TestGenerateContainerRegistryObservation(t *testing.T) {
 						IncludedRepositories:   uint64(includedRepositories),
 						IncludedStorageBytes:   uint64(includedStorageBytes),
 						AllowStorageOverage:    AllowStorageOverage,
-						IncludedBandwidthBytes: uint64(includedStorageBytes),
+						IncludedBandwidthBytes: uint64(IncludedBandwidthBytes),
 						MonthlyPriceInCents:    uint64(MonthlyPriceInCents),
 						Eligible:               eligible,
 						EligibilityReasons:     eligibilityReasons,
