@@ -6,9 +6,6 @@ PROJECT_REPO := github.com/crossplane-contrib/$(PROJECT_NAME)
 
 PLATFORMS ?= linux_amd64 linux_arm64
 
-# Crossplane related versions
-CROSSPLANE_VERSION := "1.6.4"
-
 # kind-related versions
 KIND_VERSION ?= v0.11.1
 KIND_NODE_IMAGE_TAG ?= v1.19.11
@@ -128,11 +125,11 @@ dev-kind: $(KIND) $(KUBECTL) $(HELM3)
 	@$(KUBECTL) apply -k https://github.com/crossplane/crossplane//cluster?ref=master
 	@$(INFO) Installing Provider DigitalOcean CRDs
 	@$(KUBECTL) apply -f $(CRD_DIR) -R
-	@$(INFO) Creating crossplane-system Namespace and installing Crossplane version ${CROSSPLANE_VERSION}
+	@$(INFO) Creating crossplane-system Namespace and installing Crossplane
 	@$(KUBECTL) create namespace crossplane-system
 	@$(HELM3) repo add crossplane-stable https://charts.crossplane.io/stable --force-update
 	@$(HELM3) repo update
-	@$(HELM3) install crossplane --namespace crossplane-system --version ${CROSSPLANE_VERSION} crossplane-stable/crossplane
+	@$(HELM3) install crossplane --namespace crossplane-system crossplane-stable/crossplane
 
 dev-provider:
 	@$(INFO) Starting Provider DigitalOcean controllers
