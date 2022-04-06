@@ -21,6 +21,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+
 	"github.com/crossplane/crossplane-runtime/pkg/event"
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
 	"github.com/crossplane/crossplane-runtime/pkg/meta"
@@ -48,11 +49,13 @@ const (
 )
 
 type spacesConnector struct {
-	kube client.Client
+	kube   client.Client
+	logger logging.Logger
 }
 
 type spacesExternal struct {
-	kube client.Client
+	kube   client.Client
+	logger logging.Logger
 
 	// We need these because we'll have to create a new s3 client on every request and change the endpoint based on where we're going.
 	accessKey       string
@@ -66,7 +69,7 @@ func (c *spacesConnector) Connect(ctx context.Context, mg resource.Managed) (man
 		return nil, err
 	}
 
-	return &spacesExternal{kube: c.kube, accessKey: accessKey, accessSecretKey: accessSecretKey}, nil
+	return &spacesExternal{kube: c.kube, accessKey: accessKey, accessSecretKey: accessSecretKey, logger: c.logger}, nil
 }
 
 // SetupSpaces adds a controller that reconciles DOSpaces managed resources.
@@ -78,7 +81,7 @@ func SetupSpaces(mgr ctrl.Manager, l logging.Logger) error {
 		For(&v1alpha1.DOSpace{}).
 		Complete(managed.NewReconciler(mgr,
 			resource.ManagedKind(v1alpha1.DOSpaceGroupVersionKind),
-			managed.WithExternalConnecter(&spacesConnector{kube: mgr.GetClient()}),
+			managed.WithExternalConnecter(&spacesConnector{kube: mgr.GetClient(), logger: l.WithValues("controller", name)}),
 			managed.WithReferenceResolver(managed.NewAPISimpleReferenceResolver(mgr.GetClient())),
 			managed.WithConnectionPublishers(),
 			managed.WithInitializers(managed.NewDefaultProviderConfig(mgr.GetClient())),
@@ -162,14 +165,15 @@ func (c *spacesExternal) Create(ctx context.Context, mg resource.Managed) (manag
 	create := &s3.CreateBucketInput{}
 	dospace.GenerateSpace(name, cr.Spec.ForProvider, create)
 
-	output, err := client.CreateBucket(ctx, create)
-	if err != nil || output == nil {
+	// The output doesn't really container anything so we can ignore it
+	_, err = client.CreateBucket(ctx, create)
+	if err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errSpacesCreateFailed)
 	}
 
-	meta.SetExternalName(cr, *output.Location)
+	meta.SetExternalName(cr, *create.Bucket)
 
-	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
+	return managed.ExternalCreation{}, nil
 }
 
 func (c *spacesExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {

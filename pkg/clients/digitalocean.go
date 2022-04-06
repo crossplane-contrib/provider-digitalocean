@@ -81,11 +81,11 @@ func GetS3AuthInfo(ctx context.Context, c client.Client, mg resource.Managed) (a
 	secretKeyS := &v1.Secret{}
 
 	if err := c.Get(ctx, types.NamespacedName{Name: accessKeyRef.Name, Namespace: accessKeyRef.Namespace}, accessKeyS); err != nil {
-		return "", "", err
+		return "", "", errors.Wrap(err, "failed to fetch s3 access key secret")
 	}
 
-	if err := c.Get(ctx, types.NamespacedName{Name: secretKeyS.Name, Namespace: secretKeyS.Namespace}, secretKeyS); err != nil {
-		return "", "", err
+	if err := c.Get(ctx, types.NamespacedName{Name: secretKeyRef.Name, Namespace: secretKeyRef.Namespace}, secretKeyS); err != nil {
+		return "", "", errors.Wrap(err, "failed to fetch s3 access secret key")
 	}
 
 	return string(accessKeyS.Data[accessKeyRef.Key]), string(secretKeyS.Data[secretKeyRef.Key]), nil
