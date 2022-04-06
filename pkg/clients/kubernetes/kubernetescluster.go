@@ -135,11 +135,11 @@ func GenerateObservation(observed *godo.KubernetesCluster) v1alpha1.DOKubernetes
 	return observation
 }
 
-func getStateFromGodoState(state godo.KubernetesClusterStatusState) v1alpha1.KubernetesStateType {
+func getStateFromGodoState(state godo.KubernetesClusterStatusState) v1alpha1.KubernetesState {
 	return getStateFromString(string(state))
 }
 
-func getStateFromString(state string) v1alpha1.KubernetesStateType {
+func getStateFromString(state string) v1alpha1.KubernetesState {
 	switch state {
 	case "running":
 		return v1alpha1.KubernetesStateRunning
