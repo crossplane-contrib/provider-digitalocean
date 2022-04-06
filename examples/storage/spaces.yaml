@@ -1,0 +1,9 @@
+apiVersion: storage.do.crossplane.io/v1alpha1
+kind: DOSpace
+metadata:
+  name: example-bucket
+spec:
+  forProvider:
+    region: nyc3
+  providerConfigRef:
+    name: example
