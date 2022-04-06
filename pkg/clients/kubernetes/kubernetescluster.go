@@ -16,6 +16,8 @@ package kubernetes
 import (
 	"github.com/digitalocean/godo"
 
+	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+
 	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
 	do "github.com/crossplane-contrib/provider-digitalocean/pkg/clients"
 )
@@ -59,6 +61,105 @@ func GenerateKubernetes(name string, in v1alpha1.DOKubernetesClusterParameters, 
 	}
 }
 
+// GenerateObservation generates a DOKubernetesClusterObservation from a given observed state from godo
+func GenerateObservation(observed *godo.KubernetesCluster) v1alpha1.DOKubernetesClusterObservation {
+	observation := v1alpha1.DOKubernetesClusterObservation{
+		ID:            observed.ID,
+		Name:          observed.Name,
+		Region:        observed.RegionSlug,
+		Version:       observed.VersionSlug,
+		ClusterSubnet: observed.ClusterSubnet,
+		ServiceSubnet: observed.ServiceSubnet,
+		VPCUUID:       observed.VPCUUID,
+		IPV4:          observed.IPv4,
+		Endpoint:      observed.Endpoint,
+		Tags:          observed.Tags,
+		MaintenancePolicy: v1alpha1.KubernetesClusterMaintenancePolicyObservation{
+			Policy: v1alpha1.KubernetesClusterMaintenancePolicy{
+				StartTime: observed.MaintenancePolicy.StartTime,
+				Day:       observed.MaintenancePolicy.Day.String(),
+			},
+			Duration: observed.MaintenancePolicy.Duration,
+		},
+		AutoUpgrade: observed.AutoUpgrade,
+		Status: v1alpha1.KubernetesStatus{
+			State:   getStateFromGodoState(observed.Status.State),
+			Message: observed.Status.Message,
+		},
+		CreatedAt:       observed.CreatedAt.String(),
+		UpdatedAt:       observed.UpdatedAt.String(),
+		SurgeUpgrade:    observed.SurgeUpgrade,
+		HighlyAvailable: observed.HA,
+		RegistryEnabled: observed.RegistryEnabled,
+	}
+
+	observation.NodePools = make([]v1alpha1.KubernetesNodePoolObservation, len(observed.NodePools))
+	for i, nodePool := range observed.NodePools {
+		observation.NodePools[i] = v1alpha1.KubernetesNodePoolObservation{
+			ID:        nodePool.ID,
+			Size:      nodePool.Size,
+			Name:      nodePool.Name,
+			Count:     nodePool.Count,
+			Tags:      nodePool.Tags,
+			Labels:    nodePool.Labels,
+			AutoScale: nodePool.AutoScale,
+			MinNodes:  nodePool.MinNodes,
+			MaxNodes:  nodePool.MaxNodes,
+		}
+
+		observation.NodePools[i].Taints = make([]v1alpha1.KubernetesNodePoolTaint, len(nodePool.Taints))
+		for taintIndex, taint := range nodePool.Taints {
+			observation.NodePools[i].Taints[taintIndex] = v1alpha1.KubernetesNodePoolTaint{
+				Key:    taint.Key,
+				Value:  taint.Value,
+				Effect: taint.Effect,
+			}
+		}
+
+		observation.NodePools[i].Nodes = make([]v1alpha1.KubernetesNode, len(nodePool.Nodes))
+		for nodeIndex, node := range nodePool.Nodes {
+			observation.NodePools[i].Nodes[nodeIndex] = v1alpha1.KubernetesNode{
+				ID:   node.ID,
+				Name: node.Name,
+				Status: v1alpha1.KubernetesStatus{
+					State:   getStateFromString(node.Status.State),
+					Message: node.Status.Message,
+				},
+				DropletID: node.DropletID,
+				CreatedAt: node.CreatedAt.String(),
+				UpdatedAt: node.UpdatedAt.String(),
+			}
+		}
+	}
+
+	return observation
+}
+
+func getStateFromGodoState(state godo.KubernetesClusterStatusState) v1alpha1.KubernetesState {
+	return getStateFromString(string(state))
+}
+
+func getStateFromString(state string) v1alpha1.KubernetesState {
+	switch state {
+	case "running":
+		return v1alpha1.KubernetesStateRunning
+	case "provisioning":
+		return v1alpha1.KubernetesStateProvisioning
+	case "degraded":
+		return v1alpha1.KubernetesStateDegraded
+	case "error":
+		return v1alpha1.KubernetesStateError
+	case "deleted":
+		return v1alpha1.KubernetesStateDeleted
+	case "upgrading":
+		return v1alpha1.KubernetesStateUpgrading
+	case "deleting":
+		return v1alpha1.KubernetesStateDeleting
+	default:
+		return v1alpha1.KubernetesStateError // Just return an error if we can't find the state
+	}
+}
+
 func getDayFromParam(day string) godo.KubernetesMaintenancePolicyDay {
 	switch day {
 	case "monday":
@@ -77,6 +178,26 @@ func getDayFromParam(day string) godo.KubernetesMaintenancePolicyDay {
 		return godo.KubernetesMaintenanceDaySunday
 	default:
 		return godo.KubernetesMaintenanceDayAny
+	}
+}
+
+// SetCondition sets the condition for a DOKubernetesCluster resource from its state
+func SetCondition(cr *v1alpha1.DOKubernetesCluster) {
+	switch cr.Status.AtProvider.Status.State {
+	case v1alpha1.KubernetesStateProvisioning:
+		cr.Status.SetConditions(xpv1.Creating())
+	case v1alpha1.KubernetesStateRunning:
+		fallthrough
+	case v1alpha1.KubernetesStateDegraded: // Still available just in a poor state
+		cr.Status.SetConditions(xpv1.Available())
+	case v1alpha1.KubernetesStateDeleting:
+		fallthrough
+	case v1alpha1.KubernetesStateDeleted:
+		cr.Status.SetConditions(xpv1.Deleting())
+	case v1alpha1.KubernetesStateError:
+		fallthrough
+	case v1alpha1.KubernetesStateUpgrading:
+		cr.Status.SetConditions(xpv1.Unavailable())
 	}
 }
 

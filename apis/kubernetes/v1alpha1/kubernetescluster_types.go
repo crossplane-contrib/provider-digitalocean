@@ -22,15 +22,18 @@ import (
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
 )
 
+// KubernetesState are the various states that the DOKubernetesCluster and it's components can be in
+type KubernetesState string
+
 // Known Kubernetes Cluster Statuses
 const (
-	StatusRunning      = "running"
-	StatusProvisioning = "provisioning"
-	StatusDegraded     = "degraded"
-	StatusError        = "error"
-	StatusDeleted      = "deleted"
-	StatusUpgrading    = "upgrading"
-	StatusDeleting     = "deleting"
+	KubernetesStateRunning      KubernetesState = "running"
+	KubernetesStateProvisioning KubernetesState = "provisioning"
+	KubernetesStateDegraded     KubernetesState = "degraded"
+	KubernetesStateError        KubernetesState = "error"
+	KubernetesStateDeleted      KubernetesState = "deleted"
+	KubernetesStateUpgrading    KubernetesState = "upgrading"
+	KubernetesStateDeleting     KubernetesState = "deleting"
 )
 
 // DOKubernetesClusterParameters define the desired state of a DigitalOcean Kubernetes Cluster
@@ -289,7 +292,7 @@ type KubernetesClusterMaintenancePolicyObservation struct {
 type KubernetesStatus struct {
 	// A string indicating the current status of the node.
 	// +kubebuilder:validation:Optional
-	State string `json:"state,omitempty"`
+	State KubernetesState `json:"state,omitempty"`
 
 	// A message relating to the current state
 	// +kubebuilder:validation:Optional
