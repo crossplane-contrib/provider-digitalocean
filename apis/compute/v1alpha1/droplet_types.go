@@ -81,6 +81,11 @@ type DropletParameters struct {
 	// +immutable
 	Monitoring *bool `json:"monitoring,omitempty"`
 
+	// UserData: A string used to pass user data to the DigitalOcean Droplet.
+	// +optional
+	// +immutable
+	UserData *string `json:"userData,omitempty"`
+
 	// Volumes: A flat array including the unique string identifier for each block
 	// storage volume to be attached to the Droplet. At the moment a volume can only
 	// be attached to a single Droplet.
