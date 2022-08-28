@@ -36,6 +36,7 @@ func GenerateDroplet(name string, in v1alpha1.DropletParameters, create *godo.Dr
 	create.IPv6 = do.BoolValue(in.IPv6)
 	create.PrivateNetworking = do.BoolValue(in.PrivateNetworking)
 	create.Monitoring = do.BoolValue(in.Monitoring)
+	create.UserData = do.StringValue(in.UserData)
 	create.Volumes = generateVolumes(in.Volumes)
 	create.Tags = in.Tags
 	create.VPCUUID = do.StringValue(in.VPCUUID)

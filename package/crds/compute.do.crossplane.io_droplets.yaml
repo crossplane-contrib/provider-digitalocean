@@ -107,6 +107,10 @@ spec:
                     items:
                       type: string
                     type: array
+                  userData:
+                    description: 'UserData: A string used to pass user data to the
+                      DigitalOcean Droplet.'
+                    type: string
                   volumes:
                     description: 'Volumes: A flat array including the unique string
                       identifier for each block storage volume to be attached to the
