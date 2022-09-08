@@ -21,8 +21,20 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
+    - jsonPath: .status.atProvider.privateIPv4
+      name: PRIVATE IPv4
+      type: string
+    - jsonPath: .status.atProvider.publicIPv4
+      name: PUBLIC IPv4
+      type: string
     - jsonPath: .status.conditions[?(@.type=='Ready')].status
       name: READY
+      type: string
+    - jsonPath: .status.atProvider.region
+      name: REGION
+      type: string
+    - jsonPath: .status.atProvider.size
+      name: SIZE
       type: string
     - jsonPath: .status.conditions[?(@.type=='Synced')].status
       name: SYNCED
@@ -195,6 +207,18 @@ spec:
                     description: ID for the resource. This identifier is defined by
                       the server.
                     type: integer
+                  privateIPv4:
+                    description: Private IPv4 address of the resource.
+                    type: string
+                  publicIPv4:
+                    description: Public IPv4 address of the resource.
+                    type: string
+                  region:
+                    description: Resource region slug.
+                    type: string
+                  size:
+                    description: Resource size slug.
+                    type: string
                   status:
                     description: "A Status string indicating the state of the Droplet
                       instance. \n Possible values:   \"new\"   \"active\"   \"off\"
