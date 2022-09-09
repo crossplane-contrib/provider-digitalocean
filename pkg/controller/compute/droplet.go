@@ -100,10 +100,16 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
 	docompute.LateInitializeSpec(&cr.Spec.ForProvider, *observed)
+	observedPrivateIPv4, _ := observed.PrivateIPv4()
+	observedPublicIPv4, _ := observed.PublicIPv4()
 
 	cr.Status.AtProvider = v1alpha1.DropletObservation{
 		CreationTimestamp: observed.Created,
 		ID:                observed.ID,
+		PrivateIPv4:       observedPrivateIPv4,
+		PublicIPv4:        observedPublicIPv4,
+		Region:            observed.Region.Slug,
+		Size:              observed.SizeSlug,
 		Status:            observed.Status,
 	}
 	if err := c.kube.Status().Update(ctx, cr); err != nil {
