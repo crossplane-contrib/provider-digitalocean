@@ -3,27 +3,21 @@ kind: Provider
 metadata:
   name: provider-digitalocean
   annotations:
-    source: github.com/crossplane-contrib/provider-digitalocean
-    license: Apache-2.0
-    descriptionShort: |
-      The DigitalOcean Crossplane provider enables infrastructure management
-      for DigitalOcean.
-
-    description: |
+    meta.crossplane.io/source: github.com/crossplane-contrib/provider-digitalocean
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
       The DigitalOcean Crossplane provider adds support for managing DigitalOcean
       resources in Kubernetes.
 
-    readme: |
+    meta.crossplane.io/readme: |
       `provider-digitalocean` is the Crossplane infrastructure provider for
       [DigitalOcean](https://www.digitalocean.com/).
 
       Available resources and their fields can be found in the [CRD
-      Docs](https://doc.crds.dev/github.com/crossplane-contrib/provider-digitalocean).
+      Docs](https://marketplace.upbound.io/digitalocean/provider-digitalocean/latest/crds).
 
       If you encounter an issue please reach out on
       [slack.crossplane.io](https://slack.crossplane.io) and create an issue in
-      the [crossplane-contrib/provider-digitalocean](https://github.com/crossplane-contrib/provider-digitalocean)
+      the
+      [crossplane-contrib/provider-digitalocean](https://github.com/crossplane-contrib/provider-digitalocean)
       repo.
-spec:
-  controller:
-    image: crossplane/provider-digitalocean-controller:VERSION
