@@ -81,6 +81,11 @@ type DropletParameters struct {
 	// +immutable
 	Monitoring *bool `json:"monitoring,omitempty"`
 
+	// UserData: A string used to pass user data to the DigitalOcean Droplet.
+	// +optional
+	// +immutable
+	UserData *string `json:"userData,omitempty"`
+
 	// Volumes: A flat array including the unique string identifier for each block
 	// storage volume to be attached to the Droplet. At the moment a volume can only
 	// be attached to a single Droplet.
@@ -118,6 +123,18 @@ type DropletObservation struct {
 	// ID for the resource. This identifier is defined by the server.
 	ID int `json:"id,omitempty"`
 
+	// Private IPv4 address of the resource.
+	PrivateIPv4 string `json:"privateIPv4,omitempty"`
+
+	// Public IPv4 address of the resource.
+	PublicIPv4 string `json:"publicIPv4,omitempty"`
+
+	// Resource region slug.
+	Region string `json:"region,omitempty"`
+
+	// Resource size slug.
+	Size string `json:"size,omitempty"`
+
 	// A Status string indicating the state of the Droplet instance.
 	//
 	// Possible values:
@@ -143,7 +160,11 @@ type DropletStatus struct {
 // +kubebuilder:object:root=true
 
 // A Droplet is a managed resource that represents a DigitalOcean Droplet.
+// +kubebuilder:printcolumn:name="PRIVATE IPv4",type="string",JSONPath=".status.atProvider.privateIPv4"
+// +kubebuilder:printcolumn:name="PUBLIC IPv4",type="string",JSONPath=".status.atProvider.publicIPv4"
 // +kubebuilder:printcolumn:name="READY",type="string",JSONPath=".status.conditions[?(@.type=='Ready')].status"
+// +kubebuilder:printcolumn:name="REGION",type="string",JSONPath=".status.atProvider.region"
+// +kubebuilder:printcolumn:name="SIZE",type="string",JSONPath=".status.atProvider.size"
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:scope=Cluster,categories={crossplane,managed,do}

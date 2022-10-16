@@ -41,8 +41,6 @@ func LateInitializeSpec(p *v1alpha1.DODatabaseClusterParameters, observed godo.D
 
 	if len(p.Tags) == 0 && len(observed.Tags) != 0 {
 		p.Tags = make([]string, len(observed.Tags))
-		for i, tag := range observed.Tags {
-			p.Tags[i] = tag
-		}
+		copy(p.Tags, observed.Tags)
 	}
 }

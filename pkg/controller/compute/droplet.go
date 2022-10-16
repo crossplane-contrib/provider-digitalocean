@@ -18,7 +18,6 @@ package compute
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/digitalocean/godo"
 	"github.com/google/go-cmp/cmp"
@@ -61,7 +60,7 @@ func SetupDroplet(mgr ctrl.Manager, l logging.Logger) error {
 			managed.WithExternalConnecter(&dropletConnector{kube: mgr.GetClient()}),
 			managed.WithReferenceResolver(managed.NewAPISimpleReferenceResolver(mgr.GetClient())),
 			managed.WithConnectionPublishers(),
-			managed.WithInitializers(managed.NewDefaultProviderConfig(mgr.GetClient())),
+			managed.WithInitializers(managed.NewDefaultProviderConfig(mgr.GetClient()), managed.NewNameAsExternalName(mgr.GetClient())),
 			managed.WithLogger(l.WithValues("controller", name)),
 			managed.WithRecorder(event.NewAPIRecorder(mgr.GetEventRecorderFor(name)))))
 }
@@ -89,38 +88,38 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 	if !ok {
 		return managed.ExternalObservation{}, errors.New(errNotDroplet)
 	}
-
-	if meta.GetExternalName(cr) == "" {
+	if cr.Status.AtProvider.ID == 0 {
 		return managed.ExternalObservation{
 			ResourceExists: false,
 		}, nil
 	}
-
-	externalID, err := strconv.Atoi(meta.GetExternalName(cr))
-	if err != nil {
-		// on the first try the value of 'crossplane.io/external-name' annotation
-		// is name of the 'Droplet' resource (i.e. type string,) which will get
-		// updated to id (i.e. type int) of managed resource when it gets created.
-		externalID = 0
-	}
-
-	observed, response, err := c.Droplets.Get(ctx, externalID)
+	observed, response, err := c.Droplets.Get(ctx, cr.Status.AtProvider.ID)
 	if err != nil {
 		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetDroplet)
 	}
 
 	currentSpec := cr.Spec.ForProvider.DeepCopy()
 	docompute.LateInitializeSpec(&cr.Spec.ForProvider, *observed)
-	if !cmp.Equal(currentSpec, &cr.Spec.ForProvider) {
-		if err := c.kube.Update(ctx, cr); err != nil {
-			return managed.ExternalObservation{}, errors.Wrap(err, errDropletUpdate)
-		}
-	}
+	observedPrivateIPv4, _ := observed.PrivateIPv4()
+	observedPublicIPv4, _ := observed.PublicIPv4()
 
 	cr.Status.AtProvider = v1alpha1.DropletObservation{
 		CreationTimestamp: observed.Created,
 		ID:                observed.ID,
+		PrivateIPv4:       observedPrivateIPv4,
+		PublicIPv4:        observedPublicIPv4,
+		Region:            observed.Region.Slug,
+		Size:              observed.SizeSlug,
 		Status:            observed.Status,
+	}
+	if err := c.kube.Status().Update(ctx, cr); err != nil {
+		return managed.ExternalObservation{}, errors.Wrap(err, errDropletUpdate)
+	}
+
+	if !cmp.Equal(currentSpec, &cr.Spec.ForProvider) {
+		if err := c.kube.Update(ctx, cr); err != nil {
+			return managed.ExternalObservation{}, errors.Wrap(err, errDropletUpdate)
+		}
 	}
 
 	switch cr.Status.AtProvider.Status {
@@ -146,9 +145,6 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 	cr.Status.SetConditions(xpv1.Creating())
 
 	name := meta.GetExternalName(cr)
-	if meta.GetExternalName(cr) == "" {
-		name = cr.GetName()
-	}
 
 	create := &godo.DropletCreateRequest{}
 	docompute.GenerateDroplet(name, cr.Spec.ForProvider, create)
@@ -158,8 +154,14 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 		return managed.ExternalCreation{}, errors.Wrap(err, errDropletCreateFailed)
 	}
 
-	if meta.GetExternalName(cr) == "" {
-		meta.SetExternalName(cr, strconv.Itoa(droplet.ID))
+	cr.Status.AtProvider = v1alpha1.DropletObservation{
+		CreationTimestamp: droplet.Created,
+		ID:                droplet.ID,
+		Status:            droplet.Status,
+	}
+
+	if err := c.kube.Status().Update(ctx, cr); err != nil {
+		return managed.ExternalCreation{}, errors.Wrap(err, errDropletUpdate)
 	}
 
 	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
