@@ -88,12 +88,17 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 	if !ok {
 		return managed.ExternalObservation{}, errors.New(errNotDroplet)
 	}
-	if cr.Status.AtProvider.ID == 0 {
+
+	en := meta.GetExternalName(cr)
+	id := do.GetResourceID(en)
+
+	if id == -1 {
 		return managed.ExternalObservation{
 			ResourceExists: false,
 		}, nil
 	}
-	observed, response, err := c.Droplets.Get(ctx, cr.Status.AtProvider.ID)
+
+	observed, response, err := c.Droplets.Get(ctx, id)
 	if err != nil {
 		return managed.ExternalObservation{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetDroplet)
 	}
@@ -129,7 +134,7 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 		cr.SetConditions(xpv1.Available())
 	}
 
-	// Droplets are always "up to date" because they can't be updated. ¯\_(ツ)_/¯
+	// TODO add droplet updating!
 	return managed.ExternalObservation{
 		ResourceExists:   true,
 		ResourceUpToDate: true,
@@ -143,13 +148,10 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 	}
 
 	cr.Status.SetConditions(xpv1.Creating())
-
-	name := meta.GetExternalName(cr)
-
 	create := &godo.DropletCreateRequest{}
-	docompute.GenerateDroplet(name, cr.Spec.ForProvider, create)
-
+	docompute.GenerateDroplet(cr.Name, cr.Spec.ForProvider, create)
 	droplet, _, err := c.Droplets.Create(ctx, create)
+
 	if err != nil || droplet == nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errDropletCreateFailed)
 	}
@@ -164,7 +166,7 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 		return managed.ExternalCreation{}, errors.Wrap(err, errDropletUpdate)
 	}
 
-	return managed.ExternalCreation{ExternalNameAssigned: true}, nil
+	return managed.ExternalCreation{}, nil
 }
 
 func (c *dropletExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {

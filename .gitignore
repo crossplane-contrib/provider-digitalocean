@@ -17,3 +17,6 @@ tilt-settings.json
 tild.d/
 tilt_modules/
 cluster/local/provider.Tiltfile
+
+.env
+/test-files

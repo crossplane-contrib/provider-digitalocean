@@ -1,0 +1,12 @@
+apiVersion: compute.do.crossplane.io/v1alpha1
+kind: Droplet
+metadata:
+  annotations:
+    crossplane.io/external-name: "1234567"
+  name: example
+spec:
+  # If you don't want to delete the existing droplet 
+  # when the managed resource is deleted
+  deletionPolicy: Orphan
+  providerConfigRef:
+    name: default

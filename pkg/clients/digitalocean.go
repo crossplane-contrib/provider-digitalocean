@@ -19,16 +19,19 @@ package clients
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/digitalocean/godo"
 
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	xpv1 "github.com/crossplane/crossplane-runtime/apis/common/v1"
+	"github.com/crossplane/crossplane-runtime/pkg/meta"
 	"github.com/crossplane/crossplane-runtime/pkg/resource"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/v1alpha1"
@@ -164,4 +167,26 @@ func IgnoreNotFound(err error, response *godo.Response) error {
 		return nil
 	}
 	return err
+}
+
+// GetResourceID gets the resource ID in int form for a given string.
+func GetResourceID(id string) int {
+	result, err := strconv.Atoi(id)
+
+	if err != nil {
+		return -1
+	}
+
+	return result
+}
+
+// GetNameAndID Used the get the name of the resource and an ID for it if one exists.
+// If no ID is present it will be -1
+func GetName(o metav1.Object, oName string) string {
+	name := meta.GetExternalName(o)
+	if name == "" {
+		name = oName
+	}
+
+	return name
 }
