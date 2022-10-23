@@ -1,0 +1,11 @@
+apiVersion: database.do.crossplane.io/v1alpha1
+kind: DODatabaseCluster
+metadata:
+  annotations:
+    crossplane.io/external-name: "aaaaaa-bbbb-cccc-dddd-eeeeeeeee"
+  name: example-db-cluster
+spec:
+  # This will not delete the existing resource if the Crossplane resource is deleted
+  deletionPolicy: Orphan
+  providerConfigRef:
+    name: default

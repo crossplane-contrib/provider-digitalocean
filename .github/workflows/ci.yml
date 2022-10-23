@@ -305,7 +305,7 @@ jobs:
       
       - name: Publish Artifacts to Upbound
         run: make -j2 publish BRANCH_NAME=${GITHUB_REF##*/}
-        if: env.XPKG_ACCESS_ID != ''
+        if: env.CONTRIB_DOCKER_USR != ''
         env:
           GIT_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
