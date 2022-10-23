@@ -19,6 +19,7 @@ package clients
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/digitalocean/godo"
@@ -164,4 +165,15 @@ func IgnoreNotFound(err error, response *godo.Response) error {
 		return nil
 	}
 	return err
+}
+
+// GetResourceID gets the resource ID in int form for a given string.
+func GetResourceID(id string) int {
+	result, err := strconv.Atoi(id)
+
+	if err != nil {
+		return -1
+	}
+
+	return result
 }

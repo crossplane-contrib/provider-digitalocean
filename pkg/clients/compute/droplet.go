@@ -80,6 +80,15 @@ func generateVolumes(param []string) []godo.DropletCreateVolume {
 // supplied DropletParameters that are set (i.e. non-zero) on the supplied
 // Droplet.
 func LateInitializeSpec(p *v1alpha1.DropletParameters, observed godo.Droplet) {
+
+	if p == nil {
+		return
+	}
+
+	p.Region = observed.Region.Slug
+	p.Size = observed.SizeSlug
+	p.Image = observed.Image.Slug
+
 	p.Volumes = do.LateInitializeStringSlice(p.Volumes, observed.VolumeIDs)
 	p.Tags = do.LateInitializeStringSlice(p.Tags, observed.Tags)
 	p.VPCUUID = do.LateInitializeString(p.VPCUUID, observed.VPCUUID)

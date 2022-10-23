@@ -36,74 +36,62 @@ const (
 type DropletParameters struct {
 	// Region: The unique slug identifier for the region that you wish to
 	// deploy in.
-	// +immutable
 	Region string `json:"region"`
 
 	// Size: The unique slug identifier for the size that you wish to select
 	// for this Droplet.
-	// +immutable
 	Size string `json:"size"`
 
 	// Image: The image ID of a public or private image, or the unique slug
 	// identifier for a public image. This image will be the base image for
 	// your Droplet.
-	// +immutable
 	Image string `json:"image"`
 
 	// SSHKeys: An array containing the IDs or fingerprints of the SSH keys
 	// that you wish to embed in the Droplet's root account upon creation.
 	// +optional
-	// +immutable
 	SSHKeys []string `json:"sshKeys,omitempty"`
 
 	// Backups: A boolean indicating whether automated backups should be enabled
 	// for the Droplet. Automated backups can only be enabled when the Droplet is
 	// created.
 	// +optional
-	// +immutable
 	Backups *bool `json:"backups,omitempty"`
 
 	// IPv6: A boolean indicating whether IPv6 is enabled on the Droplet.
 	// +optional
-	// +immutable
 	IPv6 *bool `json:"ipv6,omitempty"`
 
 	// PrivateNetworking: This parameter has been deprecated. Use 'vpc_uuid'
 	// instead to specify a VPC network for the Droplet. If no `vpc_uuid` is
 	// provided, the Droplet will be placed in the default VPC.
 	// +optional
-	// +immutable
 	PrivateNetworking *bool `json:"privateNetworking,omitempty"`
 
 	// Monitoring: A boolean indicating whether to install the DigitalOcean
 	// agent for monitoring.
 	// +optional
-	// +immutable
 	Monitoring *bool `json:"monitoring,omitempty"`
 
 	// UserData: A string used to pass user data to the DigitalOcean Droplet.
 	// +optional
-	// +immutable
 	UserData *string `json:"userData,omitempty"`
 
 	// Volumes: A flat array including the unique string identifier for each block
 	// storage volume to be attached to the Droplet. At the moment a volume can only
 	// be attached to a single Droplet.
 	// +optional
-	// +immutable
 	Volumes []string `json:"volumes,omitempty"`
 
 	// Tags: A flat array of tag names as strings to apply to the Droplet after it
 	// is created. Tag names can either be existing or new tags.
 	// +optional
-	// +immutable
 	Tags []string `json:"tags,omitempty"`
 
 	// VPCUUID: A string specifying the UUID of the VPC to which the Droplet
 	// will be assigned. If excluded, beginning on April 7th, 2020, the Droplet
 	// will be assigned to your account's default VPC for the region.
 	// +optional
-	// +immutable
 	VPCUUID *string `json:"vpcUuid,omitempty"`
 
 	// WithDropletAgent: A boolean indicating whether to install the DigitalOcean
@@ -111,7 +99,6 @@ type DropletParameters struct {
 	// To prevent it from being installed, set to false.
 	// To make installation errors fatal, explicitly set it to true.
 	// +optional
-	// +immutable
 	WithDropletAgent *bool `json:"withDropletAgent,omitempty"`
 }
 
@@ -148,7 +135,9 @@ type DropletObservation struct {
 // A DropletSpec defines the desired state of a Droplet.
 type DropletSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       DropletParameters `json:"forProvider"`
+
+	// +optional
+	ForProvider DropletParameters `json:"forProvider"`
 }
 
 // A DropletStatus represents the observed state of a Droplet.
