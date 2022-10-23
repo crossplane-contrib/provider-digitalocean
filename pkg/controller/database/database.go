@@ -15,7 +15,6 @@ package database
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/digitalocean/godo"
 	"github.com/google/go-cmp/cmp"
@@ -87,7 +86,9 @@ func (c *dbExternal) Observe(ctx context.Context, mg resource.Managed) (managed.
 		return managed.ExternalObservation{}, errors.New(errNotDB)
 	}
 
-	if meta.GetExternalName(cr) == "" {
+	en := meta.GetExternalName(cr)
+
+	if en == "" {
 		return managed.ExternalObservation{
 			ResourceExists: false,
 		}, nil
@@ -106,59 +107,7 @@ func (c *dbExternal) Observe(ctx context.Context, mg resource.Managed) (managed.
 		}
 	}
 
-	cr.Status.AtProvider = v1alpha1.DODatabaseClusterObservation{
-		ID:                 &observed.ID,
-		Name:               observed.Name,
-		Engine:             observed.EngineSlug,
-		Version:            observed.VersionSlug,
-		NumNodes:           observed.NumNodes,
-		Size:               observed.SizeSlug,
-		Region:             observed.RegionSlug,
-		Status:             observed.Status,
-		CreatedAt:          observed.CreatedAt.String(),
-		PrivateNetworkUUID: observed.PrivateNetworkUUID,
-		Tags:               observed.Tags,
-		DbNames:            observed.DBNames,
-		Connection: v1alpha1.DODatabaseClusterConnection{
-			URI:      &observed.Connection.URI,
-			Database: &observed.Connection.Database,
-			Host:     &observed.Connection.Host,
-			Port:     &observed.Connection.Port,
-			User:     &observed.Connection.User,
-			Password: &observed.Connection.Password,
-			SSL:      &observed.Connection.SSL,
-		},
-		PrivateConnection: v1alpha1.DODatabaseClusterConnection{
-			URI:      &observed.PrivateConnection.URI,
-			Database: &observed.PrivateConnection.Database,
-			Host:     &observed.PrivateConnection.Host,
-			Port:     &observed.PrivateConnection.Port,
-			User:     &observed.PrivateConnection.User,
-			Password: &observed.PrivateConnection.Password,
-			SSL:      &observed.PrivateConnection.SSL,
-		},
-		MaintenanceWindow: v1alpha1.DODatabaseClusterMaintenanceWindow{
-			Day:         observed.MaintenanceWindow.Day,
-			Hour:        observed.MaintenanceWindow.Hour,
-			Pending:     observed.MaintenanceWindow.Pending,
-			Description: observed.MaintenanceWindow.Description,
-		},
-	}
-
-	cr.Status.AtProvider.Users = make([]v1alpha1.DODatabaseClusterUser, len(observed.Users))
-	for i, user := range observed.Users {
-		cr.Status.AtProvider.Users[i] = v1alpha1.DODatabaseClusterUser{
-			Name:     user.Name,
-			Role:     user.Role,
-			Password: user.Password,
-		}
-
-		if user.MySQLSettings != nil {
-			cr.Status.AtProvider.Users[i].MySQLSettings = v1alpha1.DODatabaseUserMySQLSettings{
-				AuthPlugin: user.MySQLSettings.AuthPlugin,
-			}
-		}
-	}
+	cr.Status.AtProvider = dodb.GenerateObservation(observed)
 
 	setCrossplaneStatus(cr)
 
@@ -214,13 +163,7 @@ func (c *dbExternal) Create(ctx context.Context, mg resource.Managed) (managed.E
 	ec := managed.ExternalCreation{}
 
 	if cr.Spec.WriteConnectionSecretToReference != nil {
-		ec.ConnectionDetails = managed.ConnectionDetails{
-			xpv1.ResourceCredentialsSecretEndpointKey: []byte(db.Connection.URI),
-			"host":                                    []byte(db.Connection.Host),
-			xpv1.ResourceCredentialsSecretPortKey:     []byte(strconv.Itoa(db.Connection.Port)),
-			xpv1.ResourceCredentialsSecretUserKey:     []byte(db.Connection.User),
-			xpv1.ResourceCredentialsSecretPasswordKey: []byte(db.Connection.Password),
-		}
+		ec.ConnectionDetails = dodb.GenerateConnectionDetails(ctx, db, c.Client)
 	}
 
 	return ec, nil

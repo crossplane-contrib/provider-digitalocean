@@ -148,8 +148,6 @@ spec:
                 - name
                 - namespace
                 type: object
-            required:
-            - forProvider
             type: object
           status:
             description: A DODatabaseClusterStatus represents the observed state of
@@ -159,37 +157,6 @@ spec:
                 description: A DODatabaseClusterObservation reflects the observed
                   state of a Database Cluster on DigitalOcean. https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster
                 properties:
-                  connection:
-                    description: A DODatabaseClusterConnection defines the connection
-                      information for a Database Cluster.
-                    properties:
-                      database:
-                        description: The name of the default database.
-                        type: string
-                      host:
-                        description: The FQDN pointing to the database cluster's current
-                          primary node.
-                        type: string
-                      password:
-                        description: The randomly generated password for the default
-                          user.
-                        type: string
-                      port:
-                        description: The port on which the database cluster is listening.
-                        type: integer
-                      ssl:
-                        description: A boolean value indicating if the connection
-                          should be made over SSL.
-                        type: boolean
-                      uri:
-                        description: A connection string in the format accepted by
-                          the psql command. This is provided as a convenience and
-                          should be able to be constructed by the other attributes.
-                        type: string
-                      user:
-                        description: The default user for the database.
-                        type: string
-                    type: object
                   createdAt:
                     description: A time value given in ISO8601 combined date and time
                       format that represents when the database cluster was created.
@@ -242,37 +209,6 @@ spec:
                   numNodes:
                     description: The number of nodes in the database cluster.
                     type: integer
-                  private_connection:
-                    description: A DODatabaseClusterConnection defines the connection
-                      information for a Database Cluster.
-                    properties:
-                      database:
-                        description: The name of the default database.
-                        type: string
-                      host:
-                        description: The FQDN pointing to the database cluster's current
-                          primary node.
-                        type: string
-                      password:
-                        description: The randomly generated password for the default
-                          user.
-                        type: string
-                      port:
-                        description: The port on which the database cluster is listening.
-                        type: integer
-                      ssl:
-                        description: A boolean value indicating if the connection
-                          should be made over SSL.
-                        type: boolean
-                      uri:
-                        description: A connection string in the format accepted by
-                          the psql command. This is provided as a convenience and
-                          should be able to be constructed by the other attributes.
-                        type: string
-                      user:
-                        description: The default user for the database.
-                        type: string
-                    type: object
                   privateNetworkUUID:
                     description: A string specifying the UUID of the VPC to which
                       the database cluster will be assigned. If excluded, the cluster
@@ -341,7 +277,6 @@ spec:
                 - engine
                 - name
                 - numNodes
-                - private_connection
                 - region
                 - size
                 type: object

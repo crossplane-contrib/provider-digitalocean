@@ -34,34 +34,27 @@ const (
 type DODatabaseClusterParameters struct {
 	// Engine: A slug representing the database engine used for the cluster. The possible values are: "pg" for PostgreSQL, "mysql" for MySQL, "redis" for Redis, and "mongodb" for MongoDB.
 	// +kubebuilder:validation:Enum="pg";"mysql";"redis";"mongodb"
-	// +immutable
 	Engine *string `json:"engine"`
 
 	// Version: A string representing the version of the database engine in use for the cluster (Optional).
 	// +optional
-	// +immutable
 	Version *string `json:"version,omitempty"`
 
 	// NumNodes: The number of nodes in the database cluster.
-	// +immutable
 	NumNodes int `json:"numNodes"`
 
 	// Size: The slug identifier representing the size of the nodes in the database cluster.
-	// +immutable
 	Size string `json:"size"`
 
 	// Region: The slug identifier for the region where the database cluster is located.
-	// +immutable
 	Region string `json:"region"`
 
 	// PrivateNetworkUUID: A string specifying the UUID of the VPC to which the database cluster will be assigned. If excluded, the cluster when creating a new database cluster, it will be assigned to your account's default VPC for the region (Optional).
 	// +optional
-	// +immutable
 	PrivateNetworkUUID *string `json:"privateNetworkUUID,omitempty"`
 
 	// Tags: An array of tags that have been applied to the database cluster (Optional).
 	// +optional
-	// +immutable
 	Tags []string `json:"tags,omitempty"`
 }
 
@@ -112,38 +105,10 @@ type DODatabaseClusterObservation struct {
 	// An array of strings containing the names of databases created in the database cluster.
 	DbNames []string `json:"dbNames,omitempty"`
 
-	Connection DODatabaseClusterConnection `json:"connection,omitempty"`
-
-	PrivateConnection DODatabaseClusterConnection `json:"private_connection"`
-
 	Users []DODatabaseClusterUser `json:"users,omitempty"`
 
 	// +kubebuilder:validation:Optional
 	MaintenanceWindow DODatabaseClusterMaintenanceWindow `json:"maintenanceWindow,omitempty"`
-}
-
-// A DODatabaseClusterConnection defines the connection information for a Database Cluster.
-type DODatabaseClusterConnection struct {
-	// A connection string in the format accepted by the psql command. This is provided as a convenience and should be able to be constructed by the other attributes.
-	URI *string `json:"uri,omitempty"`
-
-	// The name of the default database.
-	Database *string `json:"database,omitempty"`
-
-	// The FQDN pointing to the database cluster's current primary node.
-	Host *string `json:"host,omitempty"`
-
-	// The port on which the database cluster is listening.
-	Port *int `json:"port,omitempty"`
-
-	// The default user for the database.
-	User *string `json:"user,omitempty"`
-
-	// The randomly generated password for the default user.
-	Password *string `json:"password,omitempty"`
-
-	// A boolean value indicating if the connection should be made over SSL.
-	SSL *bool `json:"ssl,omitempty"`
 }
 
 // The DODatabaseClusterUser defines a Database Cluster User.
@@ -186,7 +151,9 @@ type DODatabaseClusterMaintenanceWindow struct {
 // A DODatabaseClusterSpec defines the desired state of a Database Cluster
 type DODatabaseClusterSpec struct {
 	xpv1.ResourceSpec `json:",inline"`
-	ForProvider       DODatabaseClusterParameters `json:"forProvider"`
+
+	// +optional
+	ForProvider DODatabaseClusterParameters `json:"forProvider"`
 }
 
 // A DODatabaseClusterStatus represents the observed state of a Database Cluster

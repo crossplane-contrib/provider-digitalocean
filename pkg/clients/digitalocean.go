@@ -180,7 +180,7 @@ func GetResourceID(id string) int {
 	return result
 }
 
-// GetNameAndID Used the get the name of the resource and an ID for it if one exists.
+// GetName Used the get the name of the resource and an ID for it if one exists.
 // If no ID is present it will be -1
 func GetName(o metav1.Object, oName string) string {
 	name := meta.GetExternalName(o)

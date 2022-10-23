@@ -20,3 +20,4 @@ cluster/local/provider.Tiltfile
 
 .env
 /test-files
+cmd/provider/__debug_bin
