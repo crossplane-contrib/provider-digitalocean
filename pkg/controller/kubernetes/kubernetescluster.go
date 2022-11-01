@@ -73,6 +73,7 @@ func (c *k8sConnector) Connect(ctx context.Context, mg resource.Managed) (manage
 		return nil, err
 	}
 	client := godo.NewFromToken(token)
+	godo.SetUserAgent("crossplane")(client) //nolint:errcheck
 	return &k8sExternal{Client: client, kube: c.kube}, nil
 }
 
