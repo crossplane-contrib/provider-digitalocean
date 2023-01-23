@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/compute/v1alpha1"
+
 	"github.com/digitalocean/godo"
 )
 
