@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/digitalocean/godo"
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/kubernetes/v1alpha1"
 )
@@ -86,9 +86,7 @@ func TestGenerateContainerRegistryObservation(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			r := GenerateContainerRegistryObservation(tc.args.registry, tc.args.subscription)
-			if diff := cmp.Diff(tc.want, r); diff != "" {
-				t.Errorf("GenerateContainerRegistryObservation(...): -want, +got:\n%s", diff)
-			}
+			assert.Equal(t, tc.want, r)
 		})
 	}
 }

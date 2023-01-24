@@ -3,7 +3,7 @@ package compute
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/crossplane-contrib/provider-digitalocean/apis/compute/v1alpha1"
 
@@ -81,9 +81,7 @@ func TestGenerateDroplet(t *testing.T) {
 		t.Run(tName, func(t *testing.T) {
 			GenerateDroplet(name, tc.args.params, &tc.args.create)
 
-			if diff := cmp.Diff(tc.want, &tc.args.create); diff != "" {
-				t.Errorf("GenerateDroplet(...): -want, +got:\n%s", diff)
-			}
+			assert.Equal(t, tc.want, &tc.args.create)
 		})
 	}
 }
