@@ -73,6 +73,7 @@ func (c *k8sConnector) Connect(ctx context.Context, mg resource.Managed) (manage
 		return nil, err
 	}
 	client := godo.NewFromToken(token)
+	godo.SetUserAgent("crossplane")(client) //nolint:errcheck
 	return &k8sExternal{Client: client, kube: c.kube}, nil
 }
 
@@ -174,6 +175,6 @@ func (c *k8sExternal) Delete(ctx context.Context, mg resource.Managed) error {
 
 	cr.Status.SetConditions(xpv1.Deleting())
 
-	response, err := c.Databases.Delete(ctx, cr.Status.AtProvider.ID)
+	response, err := c.Kubernetes.Delete(ctx, cr.Status.AtProvider.ID)
 	return errors.Wrap(do.IgnoreNotFound(err, response), errK8sDeleteFailed)
 }

@@ -16,8 +16,8 @@ adds the following new functionality:
 
 ## Getting Started and Documentation
 
-For getting started guides, installation, deployment, and administration, see
-our [Documentation](https://crossplane.io/docs/latest).
+For getting started guides, installation, deployment and administration of Crossplane can be found on the official [Documentation](https://crossplane.io/docs/).
+For the first steps with the digitalocean provider you can have a look at the [installation guide](./INSTALL.md).
 
 ## Contributing
 

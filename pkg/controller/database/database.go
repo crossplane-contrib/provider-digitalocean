@@ -73,6 +73,7 @@ func (c *dbConnector) Connect(ctx context.Context, mg resource.Managed) (managed
 		return nil, err
 	}
 	client := godo.NewFromToken(token)
+	godo.SetUserAgent("crossplane")(client) //nolint:errcheck
 	return &dbExternal{Client: client, kube: c.kube}, nil
 }
 

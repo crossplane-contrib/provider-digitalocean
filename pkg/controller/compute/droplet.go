@@ -75,6 +75,7 @@ func (c *dropletConnector) Connect(ctx context.Context, mg resource.Managed) (ma
 		return nil, err
 	}
 	client := godo.NewFromToken(token)
+	godo.SetUserAgent("crossplane")(client) //nolint:errcheck
 	return &dropletExternal{Client: client, kube: c.kube}, nil
 }
 

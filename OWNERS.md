@@ -14,3 +14,4 @@ guidelines and responsibilities for the steering committee and maintainers.
 - Daniel Mangum <dan@upbound.io> ([hasheddan](https://github.com/hasheddan))
 - Khosrow Moossavi <khos2ow@gmail.com> ([khos2ow](https://github.com/khos2ow))
 - Kim Schlesinger <kschlesinger@digitalocean.com> ([kimschles](https://github.com/kimschles))
+- Lars Krieger <nopzen@larskrieger.io> ([nopzen](https://github.com/nopzen))

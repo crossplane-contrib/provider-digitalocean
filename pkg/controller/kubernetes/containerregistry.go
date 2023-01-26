@@ -74,6 +74,7 @@ func (c *containerRegistryConnector) Connect(ctx context.Context, mg resource.Ma
 		return nil, err
 	}
 	client := godo.NewFromToken(token)
+	godo.SetUserAgent("crossplane")(client) //nolint:errcheck
 	return &containerRegistryExternal{client: client.Registry, kube: c.kube}, nil
 }
 
