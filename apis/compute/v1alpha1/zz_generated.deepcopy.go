@@ -142,6 +142,11 @@ func (in *DropletParameters) DeepCopyInto(out *DropletParameters) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
+	if in.ProjectID != nil {
+		in, out := &in.ProjectID, &out.ProjectID
+		*out = new(string)
+		**out = **in
+	}
 	if in.VPCUUID != nil {
 		in, out := &in.VPCUUID, &out.VPCUUID
 		*out = new(string)

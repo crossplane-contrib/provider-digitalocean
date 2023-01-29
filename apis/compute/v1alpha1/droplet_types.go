@@ -99,6 +99,11 @@ type DropletParameters struct {
 	// +immutable
 	Tags []string `json:"tags,omitempty"`
 
+	// ProjectID: A string specifying the ID of the Project to which the Droplet
+	// will be assigned.
+	// +optional
+	ProjectID *string `json:"project"`
+
 	// VPCUUID: A string specifying the UUID of the VPC to which the Droplet
 	// will be assigned. If excluded, beginning on April 7th, 2020, the Droplet
 	// will be assigned to your account's default VPC for the region.

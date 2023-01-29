@@ -130,6 +130,27 @@ func (c *dropletExternal) Observe(ctx context.Context, mg resource.Managed) (man
 		cr.SetConditions(xpv1.Available())
 	}
 
+	if currentSpec.ProjectID != nil {
+		page := 0
+		for {
+			projectResources, _, err := c.Projects.ListResources(ctx, *currentSpec.ProjectID, &godo.ListOptions{Page: page})
+			if err != nil {
+				return managed.ExternalObservation{}, err
+			}
+			if len(projectResources) == 0 {
+				return managed.ExternalObservation{
+					ResourceExists:   true,
+					ResourceUpToDate: false,
+				}, nil
+			}
+			for _, projectResource := range projectResources {
+				if projectResource.URN == observed.URN() {
+					break
+				}
+			}
+		}
+	}
+
 	// Droplets are always "up to date" because they can't be updated. ¯\_(ツ)_/¯
 	return managed.ExternalObservation{
 		ResourceExists:   true,
@@ -160,6 +181,14 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 		ID:                droplet.ID,
 		Status:            droplet.Status,
 	}
+	currentSpec := cr.Spec.ForProvider.DeepCopy()
+
+	if currentSpec.ProjectID != nil {
+		_, _, err := c.Projects.AssignResources(ctx, *currentSpec.ProjectID, droplet)
+		if err != nil {
+			return managed.ExternalCreation{}, err
+		}
+	}
 
 	if err := c.kube.Status().Update(ctx, cr); err != nil {
 		return managed.ExternalCreation{}, errors.Wrap(err, errDropletUpdate)
@@ -169,6 +198,24 @@ func (c *dropletExternal) Create(ctx context.Context, mg resource.Managed) (mana
 }
 
 func (c *dropletExternal) Update(ctx context.Context, mg resource.Managed) (managed.ExternalUpdate, error) {
+	cr, ok := mg.(*v1alpha1.Droplet)
+	if !ok {
+		return managed.ExternalUpdate{}, errors.New(errNotDroplet)
+	}
+	observed, response, err := c.Droplets.Get(ctx, cr.Status.AtProvider.ID)
+	if err != nil {
+		return managed.ExternalUpdate{}, errors.Wrap(do.IgnoreNotFound(err, response), errGetDroplet)
+	}
+
+	currentSpec := cr.Spec.ForProvider.DeepCopy()
+
+	if currentSpec.ProjectID != nil {
+		_, _, err := c.Projects.AssignResources(ctx, *currentSpec.ProjectID, observed)
+		if err != nil {
+			return managed.ExternalUpdate{}, err
+		}
+	}
+
 	// Droplets cannot be updated.
 	return managed.ExternalUpdate{}, nil
 }

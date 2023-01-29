@@ -97,6 +97,10 @@ spec:
                       If no `vpc_uuid` is provided, the Droplet will be placed in
                       the default VPC.'
                     type: boolean
+                  project:
+                    description: 'ProjectID: A string specifying the ID of the Project
+                      to which the Droplet will be assigned.'
+                    type: string
                   region:
                     description: 'Region: The unique slug identifier for the region
                       that you wish to deploy in.'
