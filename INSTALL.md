@@ -15,7 +15,7 @@ The following tools are need on the host:
 * docker (1.12+) or Docker for Mac (17+)
 * git
 * make
-* golang
+* golang (v1.18)
 * rsync (if you're using the build container on mac)
 * helm (v2.8.2+)
 * kubebuilder (v1.0.4+)

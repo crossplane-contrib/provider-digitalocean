@@ -93,6 +93,10 @@ crds.clean:
 	@find $(CRD_DIR) -name *.yaml.sed -delete || $(FAIL)
 	@$(OK) cleaned generated CRDs
 
+crds.install:
+	@$(INFO) Installing Provider DigitalOcean CRDs
+	@$(KUBECTL) apply -f $(CRD_DIR) -R
+
 generate: crds.clean
 
 manifests:
