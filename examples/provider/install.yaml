@@ -4,4 +4,4 @@ kind: Provider
 metadata:
   name: provider-do
 spec:
-  package: "crossplane/provider-digitalocean:v0.1.0"
+  package: "crossplane/provider-digitalocean:v0.2.0"
