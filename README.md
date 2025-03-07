@@ -1,5 +1,27 @@
 # provider-digitalocean
 
+## Archival Notice
+
+**This repository, `crossplane-contrib/provider-digitalocean`, is now archived and is no longer actively maintained.**
+
+Users are strongly encouraged to migrate to the officially supported [Crossplane provider for DigitalOcean based on Upjet](https://github.com/crossplane-contrib/provider-upjet-digitalocean).
+
+**Reasons for Archival:**
+
+* The `provider-upjet-digitalocean` offers improved maintainability and aligns with the Crossplane community's best practices.
+* Upjet-based providers leverage code generation, ensuring better consistency and reducing manual maintenance overhead.
+* The newer provider benefits from continuous updates and bug fixes.
+
+**Migration Instructions:**
+
+1.  Uninstall the existing `provider-digitalocean` from your Crossplane cluster.
+2.  Install `provider-upjet-digitalocean` following the instructions in its repository.
+3.  Update your Crossplane compositions and managed resources to use the API types and resource definitions provided by `provider-upjet-digitalocean`. Refer to the provider's documentation for details on API changes.
+
+**Please update your bookmarks and references to the new repository.**
+
+-------------
+
 ## Overview
 
 `provider-digitalocean` is the Crossplane infrastructure provider for the
